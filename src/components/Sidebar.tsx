@@ -7,6 +7,15 @@ import { useClientActivity } from '@/hooks/useClientActivity';
 import { useState } from 'react';
 import { Client } from '@/types/client';
 
+// Dummy data for rep comparison - in the future, fetch from backend
+const repStats = [
+  { name: 'You', value: 78, color: 'bg-blue-500' },
+  { name: 'Anya', value: 62, color: 'bg-green-400' },
+  { name: 'Carlos', value: 55, color: 'bg-orange-400' },
+  { name: 'Tam', value: 44, color: 'bg-purple-400' },
+  { name: 'Taylor', value: 33, color: 'bg-pink-400' },
+];
+
 interface SidebarProps {
   onClose: () => void;
   onClientSelect?: (client: Client) => void;
@@ -15,7 +24,7 @@ interface SidebarProps {
 export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
   const { clients } = useClients();
   const { hotLeads, managerAlerts } = useClientActivity(clients);
-  
+
   const stats = {
     callsMade: 47,
     textsSent: 123,
@@ -34,13 +43,13 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
   // Get recent activity from all clients
   const getRecentActivity = () => {
     const activities = [];
-    
+
     clients.forEach(client => {
       // Add recent communications
       const recentComms = client.communications
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 2);
-      
+
       recentComms.forEach(comm => {
         activities.push({
           id: `${client.id}-${comm.id}`,
@@ -85,19 +94,19 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
     const now = new Date().getTime();
     const time = new Date(timestamp).getTime();
     const diff = now - time;
-    
+
     const minutes = Math.floor(diff / (1000 * 60));
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
-    
+
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
-    
+
     return `${Math.floor(hours / 24)}d ago`;
   };
 
   return (
-    <div className="w-64 bg-white h-screen shadow-lg border-r border-gray-200 flex flex-col fixed left-0 top-0 z-30">
+    <div className="w-[22rem] bg-white h-screen shadow-lg border-r border-gray-200 flex flex-col fixed left-0 top-0 z-30">
       {/* Navigation */}
       <div className="p-6 border-b border-gray-200">
         <nav className="space-y-2">
@@ -126,14 +135,40 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
         </nav>
       </div>
 
-      {/* Stats Section */}
+      {/* Analytics Section */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-2 mb-4">
           <BarChart3 className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-900">Today's Performance</h3>
+          <h3 className="font-semibold text-gray-900">Rep Standings</h3>
         </div>
-        
-        <div className="grid grid-cols-2 gap-3">
+        <div>
+          {/* Playful horizontal leaderboard */}
+          <div className="space-y-2 mb-4">
+            {repStats.map((rep, idx) => (
+              <div key={rep.name} className={`flex items-center`}>
+                <span className={`text-xs mr-2 ${idx === 0 ? "font-bold text-blue-700" : "text-gray-600"}`}>
+                  {rep.name === 'You' ? '🧑‍💼' : `#${idx+1}`}
+                </span>
+                <div className="flex-1 h-4 bg-gray-100 rounded-lg relative mr-2">
+                  <div
+                    className={`absolute left-0 top-0 h-4 rounded-lg ${rep.color}`}
+                    style={{
+                      width: `${Math.max(rep.value, 10)}%`,
+                      minWidth: 16,
+                      transition: 'width 0.4s'
+                    }}
+                  ></div>
+                </div>
+                <span className="text-xs text-gray-700 w-8 text-right font-semibold tabular-nums">{rep.value}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-blue-700 text-center mb-2">
+            You're in {1 + repStats.findIndex(r => r.name === 'You')}<sup>{['st','nd','rd','th','th'][repStats.findIndex(r => r.name === 'You')]}</sup> place! 🔥
+          </p>
+        </div>
+        {/* Analytics Summary with icons */}
+        <div className="grid grid-cols-2 gap-3 mt-2">
           <div className="bg-green-50 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center mb-1">
               <Phone className="h-4 w-4 text-green-600 mr-1" />
@@ -141,7 +176,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
             <div className="text-2xl font-bold text-green-700">{stats.callsMade}</div>
             <div className="text-xs text-green-600">Calls</div>
           </div>
-          
           <div className="bg-blue-50 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center mb-1">
               <MessageSquare className="h-4 w-4 text-blue-600 mr-1" />
@@ -149,7 +183,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
             <div className="text-2xl font-bold text-blue-700">{stats.textsSent}</div>
             <div className="text-xs text-blue-600">Texts</div>
           </div>
-          
           <div className="bg-emerald-50 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center mb-1">
               <CheckCircle className="h-4 w-4 text-emerald-600 mr-1" />
@@ -157,7 +190,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
             <div className="text-2xl font-bold text-emerald-700">{stats.dealsClosed}</div>
             <div className="text-xs text-emerald-600">Deals</div>
           </div>
-          
           <div className="bg-red-50 rounded-lg p-3 text-center">
             <div className="flex items-center justify-center mb-1">
               <Skull className="h-4 w-4 text-red-600 mr-1" />
@@ -174,7 +206,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <h3 className="font-semibold text-gray-900">Live Activity Feed</h3>
         </div>
-        
         <div className="space-y-3 max-h-96 overflow-auto">
           {recentActivity.length > 0 ? (
             recentActivity.map((activity) => (
@@ -195,7 +226,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                   )}
                 </div>
-                
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-gray-900 truncate">
@@ -214,7 +244,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
                       <>📤 {activity.content}</>
                     )}
                   </p>
-                  
                   {/* Activity badges */}
                   <div className="flex items-center space-x-1 mt-2">
                     {activity.isHotLead && (
