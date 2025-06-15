@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ClientCard } from '@/components/ClientCard';
 import { ClientProfile } from '@/components/ClientProfile';
@@ -46,7 +45,7 @@ const Index = () => {
     }
   };
 
-  const updateClientStage = (clientId: string, newStage: string) => {
+  const updateClientStage = (clientId: string, newStage: Client['stage']) => {
     setClients(prev => prev.map(client => 
       client.id === clientId ? { ...client, stage: newStage } : client
     ));
