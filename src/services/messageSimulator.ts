@@ -57,9 +57,14 @@ export class MessageSimulator {
   start(clients: Client[]) {
     if (this.intervalId) return;
 
-    this.intervalId = setInterval(() => {
+    // Send first message immediately after 5 seconds, then every 15-30 seconds
+    setTimeout(() => {
       this.simulateMessage(clients);
-    }, 60000 + Math.random() * 30000); // 60-90 seconds
+      
+      this.intervalId = setInterval(() => {
+        this.simulateMessage(clients);
+      }, 15000 + Math.random() * 15000); // 15-30 seconds
+    }, 5000); // 5 second initial delay
   }
 
   stop() {
@@ -86,8 +91,8 @@ export class MessageSimulator {
       message.toLowerCase().includes(trigger)
     );
 
-    // Determine if this should make the lead "hot"
-    const isHotLead = client.stage === 'Docs In' && Math.random() > 0.7;
+    // Determine if this should make the lead "hot" - increased chance for testing
+    const isHotLead = client.stage === 'Docs In' && Math.random() > 0.4;
 
     // Create incoming message
     const incomingMessage: Communication = {
@@ -97,6 +102,14 @@ export class MessageSimulator {
       timestamp: new Date().toISOString(),
       direction: 'inbound'
     };
+
+    console.log(`📱 Simulating message from ${client.name}: ${message}`);
+    if (needsManagerAttention) {
+      console.log(`🚨 Manager alert triggered for ${client.name}`);
+    }
+    if (isHotLead) {
+      console.log(`🔥 Hot lead generated for ${client.name}`);
+    }
 
     this.onUpdate({
       clientId: client.id,
@@ -114,6 +127,8 @@ export class MessageSimulator {
         timestamp: new Date().toISOString(),
         direction: 'outbound'
       };
+
+      console.log(`🤖 AI responding to ${client.name}: ${response}`);
 
       this.onUpdate({
         clientId: client.id,
