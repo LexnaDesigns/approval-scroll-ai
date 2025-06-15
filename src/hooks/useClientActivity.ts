@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Client } from '@/types/client';
 import { MessageSimulator, MessageUpdate } from '@/services/messageSimulator';
@@ -73,16 +72,6 @@ export const useClientActivity = (clients: Client[]) => {
     };
   }, [handleMessageUpdate, clients.length]);
 
-  const markAsApproved = useCallback((clientId: string, clientName: string) => {
-    setHotLeads(prev => new Set([...prev, clientId]));
-    
-    toast({
-      title: "🔥 Lead is Hot!",
-      description: `${clientName} is approved and ready to present - income verified!`,
-      duration: 5000,
-    });
-  }, []);
-
   const clearManagerAlert = useCallback((clientId: string) => {
     setManagerAlerts(prev => {
       const newSet = new Set(prev);
@@ -94,7 +83,6 @@ export const useClientActivity = (clients: Client[]) => {
   return {
     hotLeads,
     managerAlerts,
-    markAsApproved,
     clearManagerAlert
   };
 };

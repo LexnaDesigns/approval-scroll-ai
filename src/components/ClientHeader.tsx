@@ -34,7 +34,7 @@ export const ClientHeader = ({ client, isHotLead }: ClientHeaderProps) => {
         <h3 className="font-semibold text-gray-900 text-base">{client.name}</h3>
         <div className="flex items-center space-x-3">
           <p className={`font-medium text-xs ${getCreditScoreColor(client.creditScore)}`}>
-            {client.creditScore} FICO
+            {client.creditScore} Equifax
           </p>
           <Badge className={`${getStageColor(client.stage)} text-white text-xs px-2 py-1`}>
             {client.stage}

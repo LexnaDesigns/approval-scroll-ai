@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -110,7 +109,7 @@ const Index = () => {
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const { hotLeads, managerAlerts, markAsApproved, clearManagerAlert } = useClientActivity(clients);
+  const { hotLeads, managerAlerts, clearManagerAlert } = useClientActivity(clients);
   
   const updateStageMutation = useUpdateClientStage();
   const deleteClientMutation = useDeleteClient();
@@ -128,17 +127,21 @@ const Index = () => {
       case 'email':
         setShowEmailModal(true);
         break;
-      case 'docRequest':
+      case 'docs':
         setShowDocRequestModal(true);
         break;
-      case 'approve':
-        markAsApproved(client.id, client.name);
+      case 'present':
+        updateStageMutation.mutate({ clientId: client.id, newStage: 'Presenting Options' });
+        toast({ title: 'Stage Updated', description: `${client.name} is now in 'Presenting Options' stage.` });
         break;
       case 'close':
         setShowCloseDealModal(true);
         break;
       case 'kill':
         deleteClientMutation.mutate(client.id);
+        if (selectedClient?.id === client.id) {
+            setSelectedClient(null);
+        }
         break;
     }
   };

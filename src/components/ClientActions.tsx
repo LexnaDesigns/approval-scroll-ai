@@ -1,7 +1,6 @@
 
-import { useState } from 'react';
 import { Client } from '@/types/client';
-import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, AlertTriangle, Check } from 'lucide-react';
+import { Phone, Mail, Target, CheckCircle, AlertTriangle, Menu, FilePlus2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ClientActionsProps {
@@ -12,14 +11,6 @@ interface ClientActionsProps {
 }
 
 export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert }: ClientActionsProps) => {
-  const [showApproveCheck, setShowApproveCheck] = useState(false);
-
-  const handleApprove = () => {
-    setShowApproveCheck(true);
-    onAction(client, 'approve');
-    setTimeout(() => setShowApproveCheck(false), 2000);
-  };
-
   return (
     <div className="bg-gray-50 px-3 py-2 flex items-center justify-between border-t">
       <div className="flex space-x-1">
@@ -37,7 +28,7 @@ export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert 
           onClick={() => onAction(client, 'text')}
           className="h-7 w-7 p-0 hover:bg-green-50 hover:border-green-300"
         >
-          <MessageSquare className="h-3 w-3" />
+          <Menu className="h-3 w-3" />
         </Button>
         <Button
           size="sm"
@@ -50,10 +41,10 @@ export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert 
         <Button
           size="sm"
           variant="outline"
-          onClick={() => onAction(client, 'docRequest')}
+          onClick={() => onAction(client, 'docs')}
           className="h-7 w-7 p-0 hover:bg-orange-50 hover:border-orange-300"
         >
-          <FileText className="h-3 w-3" />
+          <FilePlus2 className="h-3 w-3" />
         </Button>
         {hasManagerAlert && onClearAlert && (
           <Button
@@ -81,17 +72,6 @@ export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert 
         </Button>
         <Button
           size="sm"
-          onClick={handleApprove}
-          className={`h-7 w-7 p-0 transition-colors ${
-            showApproveCheck 
-              ? 'bg-green-600 text-white' 
-              : 'bg-orange-600 hover:bg-orange-700 text-white'
-          }`}
-        >
-          {showApproveCheck ? <Check className="h-3 w-3" /> : '✓'}
-        </Button>
-        <Button
-          size="sm"
           onClick={() => onAction(client, 'close')}
           className="bg-green-600 hover:bg-green-700 text-white h-7 px-2 text-xs"
         >
@@ -104,7 +84,7 @@ export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert 
           onClick={() => onAction(client, 'kill')}
           className="hover:bg-red-700 h-7 w-7 p-0"
         >
-          <Skull className="h-3 w-3" />
+          <X className="h-3 w-3" />
         </Button>
       </div>
     </div>

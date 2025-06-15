@@ -1,6 +1,6 @@
 
 import { Client } from '@/types/client';
-import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull } from 'lucide-react';
+import { Phone, Mail, Target, CheckCircle, Menu, FilePlus2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ClientProfileActionsProps {
@@ -25,7 +25,7 @@ export const ClientProfileActions = ({ client, onAction }: ClientProfileActionsP
           onClick={() => onAction(client, 'text')}
           className="hover:bg-green-50 hover:border-green-300"
         >
-          <MessageSquare className="h-4 w-4 mr-2" />
+          <Menu className="h-4 w-4 mr-2" />
           Text
         </Button>
         <Button
@@ -38,11 +38,11 @@ export const ClientProfileActions = ({ client, onAction }: ClientProfileActionsP
         </Button>
         <Button
           variant="outline"
-          onClick={() => onAction(client, 'docRequest')}
+          onClick={() => onAction(client, 'docs')}
           className="hover:bg-orange-50 hover:border-orange-300"
         >
-          <FileText className="h-4 w-4 mr-2" />
-          Doc Request
+          <FilePlus2 className="h-4 w-4 mr-2" />
+          Docs
         </Button>
       </div>
       
@@ -66,7 +66,7 @@ export const ClientProfileActions = ({ client, onAction }: ClientProfileActionsP
           onClick={() => onAction(client, 'kill')}
           className="hover:bg-red-700"
         >
-          <Skull className="h-4 w-4 mr-2" />
+          <X className="h-4 w-4 mr-2" />
           Kill Lead
         </Button>
       </div>
