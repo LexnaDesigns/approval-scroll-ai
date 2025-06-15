@@ -3,36 +3,49 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Client } from '@/types/client';
 import { MessageSimulator, MessageUpdate } from '@/services/messageSimulator';
 import { toast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-export const useClientActivity = (clients: Client[], setClients: React.Dispatch<React.SetStateAction<Client[]>>) => {
+export const useClientActivity = (clients: Client[]) => {
+  const queryClient = useQueryClient();
   const [hotLeads, setHotLeads] = useState<Set<string>>(new Set());
   const [managerAlerts, setManagerAlerts] = useState<Set<string>>(new Set());
 
-  const handleMessageUpdate = useCallback((update: MessageUpdate) => {
-    // Update client communications and show toast if needed
-    setClients(prevClients => {
-      if (update.needsManagerAttention) {
-        const client = prevClients.find(c => c.id === update.clientId);
-        if (client) {
-          toast({
-            title: "🚨 Manager Attention Required",
-            description: `${client.name} needs your review - they're asking about pricing/terms`,
-            duration: 8000,
-          });
-        }
-      }
-      
-      return prevClients.map(client => {
-        if (client.id === update.clientId) {
-          return {
-            ...client,
-            communications: [...client.communications, update.communication]
-          };
-        }
-        return client;
-      });
+  const handleMessageUpdate = useCallback(async (update: MessageUpdate) => {
+    // Persist communication to Supabase
+    const { error } = await supabase.from('communications').insert({
+        id: update.communication.id,
+        client_id: update.clientId,
+        type: update.communication.type,
+        content: update.communication.content,
+        timestamp: update.communication.timestamp,
+        direction: update.communication.direction,
     });
 
+    if (error) {
+        toast({
+            title: "Error saving message",
+            description: error.message,
+            variant: "destructive",
+        });
+        console.error("Error inserting communication:", error);
+        return;
+    }
+    
+    // Invalidate query to refetch data
+    await queryClient.invalidateQueries({ queryKey: ['clients'] });
+
+    if (update.needsManagerAttention) {
+      const client = clients.find(c => c.id === update.clientId);
+      if (client) {
+        toast({
+          title: "🚨 Manager Attention Required",
+          description: `${client.name} needs your review - they're asking about pricing/terms`,
+          duration: 8000,
+        });
+      }
+    }
+    
     // Handle manager alerts
     if (update.needsManagerAttention) {
       setManagerAlerts(prev => new Set([...prev, update.clientId]));
@@ -42,7 +55,7 @@ export const useClientActivity = (clients: Client[], setClients: React.Dispatch<
     if (update.isHotLead) {
       setHotLeads(prev => new Set([...prev, update.clientId]));
     }
-  }, [setClients]);
+  }, [clients, queryClient]);
 
   // Use a ref to give the simulator access to the latest clients array
   // without re-triggering the useEffect that creates the simulator.
@@ -50,13 +63,15 @@ export const useClientActivity = (clients: Client[], setClients: React.Dispatch<
   clientsRef.current = clients;
 
   useEffect(() => {
+    if (clients.length === 0) return; // Don't start simulator until clients are loaded
+    
     const simulator = new MessageSimulator(handleMessageUpdate);
     simulator.start(() => clientsRef.current);
 
     return () => {
       simulator.stop();
     };
-  }, [handleMessageUpdate]);
+  }, [handleMessageUpdate, clients.length]);
 
   const markAsApproved = useCallback((clientId: string, clientName: string) => {
     setHotLeads(prev => new Set([...prev, clientId]));

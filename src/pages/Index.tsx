@@ -1,5 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { ClientCard } from '@/components/ClientCard';
 import { ClientProfile } from '@/components/ClientProfile';
 import { TextComposeModal } from '@/components/TextComposeModal';
@@ -7,13 +9,99 @@ import { EmailComposeModal } from '@/components/EmailComposeModal';
 import { DocRequestModal } from '@/components/DocRequestModal';
 import { CloseDealModal } from '@/components/CloseDealModal';
 import { Sidebar } from '@/components/Sidebar';
-import { Menu, X } from 'lucide-react';
+import { Menu, Loader2 } from 'lucide-react';
 import { Client } from '@/types/client';
-import { mockClients } from '@/data/mockClients';
 import { useClientActivity } from '@/hooks/useClientActivity';
+import { toast } from '@/components/ui/use-toast';
+
+const mapRawClientToClient = (rawClient: any): Client => ({
+  id: rawClient.id,
+  name: rawClient.name,
+  phone: rawClient.phone,
+  email: rawClient.email,
+  address: rawClient.address,
+  creditScore: rawClient.credit_score || 0,
+  stage: rawClient.stage,
+  aiSummary: rawClient.ai_summary,
+  fullAiSummary: rawClient.full_ai_summary,
+  employer: rawClient.employer,
+  jobTitle: rawClient.job_title,
+  monthlyIncome: rawClient.monthly_income,
+  documents: {
+      license: rawClient.has_license || false,
+      income: rawClient.has_income_proof || false,
+      images: rawClient.document_images || [],
+  },
+  alerts: rawClient.alerts || [],
+  communications: (rawClient.communications || []).map((comm: any) => ({
+      id: comm.id,
+      type: comm.type,
+      content: comm.content,
+      timestamp: comm.timestamp,
+      direction: comm.direction,
+  })),
+  createdAt: rawClient.created_at,
+});
+
+const useUpdateClientStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+      mutationFn: async ({ clientId, newStage }: { clientId: string, newStage: Client['stage'] }) => {
+          const { error } = await supabase
+              .from('clients')
+              .update({ stage: newStage })
+              .eq('id', clientId);
+          if (error) throw error;
+      },
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['clients'] });
+      },
+      onError: (error) => {
+          toast({ title: 'Error updating stage', description: error.message, variant: 'destructive' });
+      }
+  });
+};
+
+const useDeleteClient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+      mutationFn: async (clientId: string) => {
+          const { error } = await supabase.from('clients').delete().eq('id', clientId);
+          if (error) throw error;
+      },
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['clients'] });
+      },
+      onError: (error) => {
+          toast({ title: 'Error deleting client', description: error.message, variant: 'destructive' });
+      }
+  });
+};
+
 
 const Index = () => {
-  const [clients, setClients] = useState<Client[]>(mockClients);
+  const queryClient = useQueryClient();
+  
+  const fetchClients = async () => {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('*, communications(*)')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  };
+
+  const { data: rawClients, isLoading, isError, error } = useQuery({
+    queryKey: ['clients'],
+    queryFn: fetchClients,
+  });
+
+  const clients = useMemo(() => {
+    if (!rawClients) return [];
+    return rawClients.map(mapRawClientToClient);
+  }, [rawClients]);
+
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showTextModal, setShowTextModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -22,7 +110,10 @@ const Index = () => {
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const { hotLeads, managerAlerts, markAsApproved, clearManagerAlert } = useClientActivity(clients, setClients);
+  const { hotLeads, managerAlerts, markAsApproved, clearManagerAlert } = useClientActivity(clients);
+  
+  const updateStageMutation = useUpdateClientStage();
+  const deleteClientMutation = useDeleteClient();
 
   const handleClientAction = (client: Client, action: string) => {
     setActiveClient(client);
@@ -47,15 +138,13 @@ const Index = () => {
         setShowCloseDealModal(true);
         break;
       case 'kill':
-        setClients(prev => prev.filter(c => c.id !== client.id));
+        deleteClientMutation.mutate(client.id);
         break;
     }
   };
 
   const updateClientStage = (clientId: string, newStage: Client['stage']) => {
-    setClients(prev => prev.map(client => 
-      client.id === clientId ? { ...client, stage: newStage } : client
-    ));
+    updateStageMutation.mutate({ clientId, newStage });
   };
 
   return (
@@ -100,19 +189,32 @@ const Index = () => {
 
         {/* Main Feed */}
         <main className="p-4 max-w-2xl mx-auto">
-          <div className="space-y-4">
-            {clients.map((client) => (
-              <ClientCard
-                key={client.id}
-                client={client}
-                onAction={handleClientAction}
-                onSelect={setSelectedClient}
-                isHotLead={hotLeads.has(client.id)}
-                hasManagerAlert={managerAlerts.has(client.id)}
-                onClearAlert={() => clearManagerAlert(client.id)}
-              />
-            ))}
-          </div>
+          {isLoading && (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-8 w-8 text-gray-500 animate-spin" />
+              <span className="ml-2 text-gray-500">Loading Clients...</span>
+            </div>
+          )}
+          {isError && (
+             <div className="text-red-500 text-center py-10">
+              Error loading clients: {error.message}
+            </div>
+          )}
+          {!isLoading && !isError && (
+            <div className="space-y-4">
+              {clients.map((client) => (
+                <ClientCard
+                  key={client.id}
+                  client={client}
+                  onAction={handleClientAction}
+                  onSelect={setSelectedClient}
+                  isHotLead={hotLeads.has(client.id)}
+                  hasManagerAlert={managerAlerts.has(client.id)}
+                  onClearAlert={() => clearManagerAlert(client.id)}
+                />
+              ))}
+            </div>
+          )}
         </main>
       </div>
 

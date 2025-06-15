@@ -13,52 +13,96 @@ export type Database = {
         Row: {
           address: string | null
           ai_summary: string | null
+          alerts: string[] | null
           created_at: string | null
           credit_score: number | null
-          docs_uploaded: boolean | null
+          document_images: string[] | null
           email: string | null
-          employment: string | null
-          full_name: string
+          employer: string | null
+          full_ai_summary: string | null
           has_income_proof: boolean | null
           has_license: boolean | null
           id: string
-          income: number | null
+          job_title: string | null
+          monthly_income: number | null
+          name: string
           phone: string | null
-          stage: string | null
+          stage: Database["public"]["Enums"]["client_stage"] | null
         }
         Insert: {
           address?: string | null
           ai_summary?: string | null
+          alerts?: string[] | null
           created_at?: string | null
           credit_score?: number | null
-          docs_uploaded?: boolean | null
+          document_images?: string[] | null
           email?: string | null
-          employment?: string | null
-          full_name: string
+          employer?: string | null
+          full_ai_summary?: string | null
           has_income_proof?: boolean | null
           has_license?: boolean | null
-          id?: string
-          income?: number | null
+          id: string
+          job_title?: string | null
+          monthly_income?: number | null
+          name: string
           phone?: string | null
-          stage?: string | null
+          stage?: Database["public"]["Enums"]["client_stage"] | null
         }
         Update: {
           address?: string | null
           ai_summary?: string | null
+          alerts?: string[] | null
           created_at?: string | null
           credit_score?: number | null
-          docs_uploaded?: boolean | null
+          document_images?: string[] | null
           email?: string | null
-          employment?: string | null
-          full_name?: string
+          employer?: string | null
+          full_ai_summary?: string | null
           has_income_proof?: boolean | null
           has_license?: boolean | null
           id?: string
-          income?: number | null
+          job_title?: string | null
+          monthly_income?: number | null
+          name?: string
           phone?: string | null
-          stage?: string | null
+          stage?: Database["public"]["Enums"]["client_stage"] | null
         }
         Relationships: []
+      }
+      communications: {
+        Row: {
+          client_id: string
+          content: string
+          direction: Database["public"]["Enums"]["communication_direction"]
+          id: string
+          timestamp: string
+          type: Database["public"]["Enums"]["communication_type"]
+        }
+        Insert: {
+          client_id: string
+          content: string
+          direction: Database["public"]["Enums"]["communication_direction"]
+          id: string
+          timestamp: string
+          type: Database["public"]["Enums"]["communication_type"]
+        }
+        Update: {
+          client_id?: string
+          content?: string
+          direction?: Database["public"]["Enums"]["communication_direction"]
+          id?: string
+          timestamp?: string
+          type?: Database["public"]["Enums"]["communication_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communications_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -71,7 +115,15 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      client_stage:
+        | "New Lead"
+        | "Docs In"
+        | "Presenting Options"
+        | "Funding"
+        | "Delivered"
+        | "Killed"
+      communication_direction: "inbound" | "outbound"
+      communication_type: "text" | "email" | "call" | "ai"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -186,6 +238,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      client_stage: [
+        "New Lead",
+        "Docs In",
+        "Presenting Options",
+        "Funding",
+        "Delivered",
+        "Killed",
+      ],
+      communication_direction: ["inbound", "outbound"],
+      communication_type: ["text", "email", "call", "ai"],
+    },
   },
 } as const
