@@ -57,13 +57,13 @@ export class MessageSimulator {
   start(clients: Client[]) {
     if (this.intervalId) return;
 
-    // Send first message immediately after 5 seconds, then every 15-30 seconds
+    // Send first message immediately after 5 seconds, then every 45 seconds
     setTimeout(() => {
       this.simulateMessage(clients);
       
       this.intervalId = setInterval(() => {
         this.simulateMessage(clients);
-      }, 15000 + Math.random() * 15000); // 15-30 seconds
+      }, 45000); // 45 seconds for demo
     }, 5000); // 5 second initial delay
   }
 

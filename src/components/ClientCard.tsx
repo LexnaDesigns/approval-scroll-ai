@@ -1,8 +1,9 @@
 
 import { Client } from '@/types/client';
-import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, AlertTriangle } from 'lucide-react';
+import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, AlertTriangle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 
 interface ClientCardProps {
   client: Client;
@@ -21,6 +22,8 @@ export const ClientCard = ({
   hasManagerAlert = false,
   onClearAlert 
 }: ClientCardProps) => {
+  const [showApproveCheck, setShowApproveCheck] = useState(false);
+
   const getStageColor = (stage: string) => {
     switch (stage) {
       case 'New Lead': return 'bg-blue-500';
@@ -38,156 +41,130 @@ export const ClientCard = ({
     return 'text-red-600';
   };
 
+  const handleApprove = () => {
+    setShowApproveCheck(true);
+    onAction(client, 'approve');
+    setTimeout(() => setShowApproveCheck(false), 2000);
+  };
+
   const cardClasses = `
-    bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden 
-    hover:shadow-xl transition-all duration-300 animate-fade-in
+    bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden 
+    hover:shadow-lg transition-all duration-300 animate-fade-in
     ${isHotLead ? 'animate-pulse ring-2 ring-orange-400 ring-opacity-75' : ''}
     ${hasManagerAlert ? 'ring-2 ring-red-400 ring-opacity-75' : ''}
   `;
 
   return (
     <div className={cardClasses}>
-      {/* Header */}
+      {/* Compact Header */}
       <div 
-        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors relative"
+        className="p-3 cursor-pointer hover:bg-gray-50 transition-colors relative"
         onClick={() => onSelect(client)}
       >
-        {/* Manager Alert Badge */}
-        {hasManagerAlert && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge className="bg-red-500 text-white animate-pulse">
+        {/* Alert Badges - Smaller and positioned better */}
+        <div className="absolute top-2 right-2 flex gap-1">
+          {hasManagerAlert && (
+            <Badge className="bg-red-500 text-white text-xs px-2 py-1 animate-pulse">
               <AlertTriangle className="h-3 w-3 mr-1" />
-              Manager Review
+              Alert
             </Badge>
-          </div>
-        )}
-
-        {/* Hot Lead Indicator */}
-        {isHotLead && (
-          <div className="absolute top-2 left-2 z-10">
-            <Badge className="bg-orange-500 text-white animate-pulse">
-              🔥 Ready to Present
+          )}
+          {isHotLead && (
+            <Badge className="bg-orange-500 text-white text-xs px-2 py-1 animate-pulse">
+              🔥 Hot
             </Badge>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex items-center justify-between mb-3 mt-8">
+        {/* Client Info - More Compact */}
+        <div className="flex items-center justify-between mb-2 pr-16">
           <div className="flex items-center space-x-3">
-            <div className={`w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg ${isHotLead ? 'animate-pulse' : ''}`}>
+            <div className={`w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm ${isHotLead ? 'animate-pulse' : ''}`}>
               {client.name.split(' ').map(n => n[0]).join('')}
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg">{client.name}</h3>
-              <p className={`font-bold text-sm ${getCreditScoreColor(client.creditScore)}`}>
-                Credit Score: {client.creditScore}
-              </p>
+              <h3 className="font-semibold text-gray-900 text-base">{client.name}</h3>
+              <div className="flex items-center space-x-3">
+                <p className={`font-medium text-xs ${getCreditScoreColor(client.creditScore)}`}>
+                  {client.creditScore} FICO
+                </p>
+                <Badge className={`${getStageColor(client.stage)} text-white text-xs px-2 py-1`}>
+                  {client.stage}
+                </Badge>
+              </div>
             </div>
           </div>
-          <Badge className={`${getStageColor(client.stage)} text-white px-3 py-1`}>
-            {client.stage}
-          </Badge>
         </div>
 
-        {/* AI Summary */}
-        <p className="text-gray-700 text-sm mb-3 leading-relaxed">
+        {/* AI Summary - Condensed */}
+        <p className="text-gray-700 text-xs mb-2 leading-relaxed">
           {client.aiSummary}
         </p>
 
-        {/* Recent Communication Indicator */}
-        {client.communications.length > 0 && (
-          <div className="mb-3">
-            <div className="text-xs text-gray-500 flex items-center space-x-2">
-              <MessageSquare className="h-3 w-3" />
-              <span>
-                Last contact: {new Date(client.communications[client.communications.length - 1].timestamp).toLocaleString()}
-              </span>
-              <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
+        {/* Document Status & Communication - Single Line */}
+        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
+              {client.documents.license ? (
+                <CheckCircle className="h-3 w-3 text-green-500" />
+              ) : (
+                <div className="h-3 w-3 rounded-full border border-red-500" />
+              )}
+              <span>ID</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              {client.documents.income ? (
+                <CheckCircle className="h-3 w-3 text-green-500" />
+              ) : (
+                <div className="h-3 w-3 rounded-full border border-red-500" />
+              )}
+              <span>Income</span>
             </div>
           </div>
-        )}
-
-        {/* Document Status */}
-        <div className="flex items-center space-x-4 mb-3">
-          <div className="flex items-center space-x-1">
-            {client.documents.license ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : (
-              <div className="h-4 w-4 rounded-full border-2 border-red-500" />
-            )}
-            <span className="text-xs text-gray-600">License</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            {client.documents.income ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : (
-              <div className="h-4 w-4 rounded-full border-2 border-red-500" />
-            )}
-            <span className="text-xs text-gray-600">Income</span>
-          </div>
+          
+          {client.communications.length > 0 && (
+            <div className="flex items-center space-x-1">
+              <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Active</span>
+            </div>
+          )}
         </div>
-
-        {/* Document Thumbnails */}
-        {client.documents.images.length > 0 && (
-          <div className="flex space-x-2 mb-3">
-            {client.documents.images.slice(0, 3).map((image, index) => (
-              <div key={index} className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                <FileText className="h-6 w-6 text-gray-500" />
-              </div>
-            ))}
-            {client.documents.images.length > 3 && (
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                <span className="text-xs text-gray-600">+{client.documents.images.length - 3}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Alerts */}
-        {client.alerts.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {client.alerts.map((alert, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {alert}
-              </Badge>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Action Bar */}
-      <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t">
-        <div className="flex space-x-2">
+      {/* Compact Action Bar */}
+      <div className="bg-gray-50 px-3 py-2 flex items-center justify-between border-t">
+        <div className="flex space-x-1">
           <Button
             size="sm"
             variant="outline"
             onClick={() => onAction(client, 'call')}
-            className="hover:bg-blue-50 hover:border-blue-300"
+            className="h-7 w-7 p-0 hover:bg-blue-50 hover:border-blue-300"
           >
-            <Phone className="h-4 w-4" />
+            <Phone className="h-3 w-3" />
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => onAction(client, 'text')}
-            className="hover:bg-green-50 hover:border-green-300"
+            className="h-7 w-7 p-0 hover:bg-green-50 hover:border-green-300"
           >
-            <MessageSquare className="h-4 w-4" />
+            <MessageSquare className="h-3 w-3" />
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => onAction(client, 'email')}
-            className="hover:bg-purple-50 hover:border-purple-300"
+            className="h-7 w-7 p-0 hover:bg-purple-50 hover:border-purple-300"
           >
-            <Mail className="h-4 w-4" />
+            <Mail className="h-3 w-3" />
           </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => onAction(client, 'docRequest')}
-            className="hover:bg-orange-50 hover:border-orange-300"
+            className="h-7 w-7 p-0 hover:bg-orange-50 hover:border-orange-300"
           >
-            <FileText className="h-4 w-4" />
+            <FileText className="h-3 w-3" />
           </Button>
           {hasManagerAlert && onClearAlert && (
             <Button
@@ -197,44 +174,48 @@ export const ClientCard = ({
                 e.stopPropagation();
                 onClearAlert();
               }}
-              className="hover:bg-red-50 hover:border-red-300 text-red-600"
+              className="h-7 w-7 p-0 hover:bg-red-50 hover:border-red-300 text-red-600"
             >
-              <AlertTriangle className="h-4 w-4" />
+              <AlertTriangle className="h-3 w-3" />
             </Button>
           )}
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-1">
           <Button
             size="sm"
             onClick={() => onAction(client, 'present')}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white h-7 px-2 text-xs"
           >
-            <Target className="h-4 w-4 mr-1" />
+            <Target className="h-3 w-3 mr-1" />
             Present
           </Button>
           <Button
             size="sm"
-            onClick={() => onAction(client, 'approve')}
-            className="bg-orange-600 hover:bg-orange-700 text-white"
+            onClick={handleApprove}
+            className={`h-7 w-7 p-0 transition-colors ${
+              showApproveCheck 
+                ? 'bg-green-600 text-white' 
+                : 'bg-orange-600 hover:bg-orange-700 text-white'
+            }`}
           >
-            ✓ Approve
+            {showApproveCheck ? <Check className="h-3 w-3" /> : '✓'}
           </Button>
           <Button
             size="sm"
             onClick={() => onAction(client, 'close')}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white h-7 px-2 text-xs"
           >
-            <CheckCircle className="h-4 w-4 mr-1" />
+            <CheckCircle className="h-3 w-3 mr-1" />
             Close
           </Button>
           <Button
             size="sm"
             variant="destructive"
             onClick={() => onAction(client, 'kill')}
-            className="hover:bg-red-700"
+            className="hover:bg-red-700 h-7 w-7 p-0"
           >
-            <Skull className="h-4 w-4" />
+            <Skull className="h-3 w-3" />
           </Button>
         </div>
       </div>
