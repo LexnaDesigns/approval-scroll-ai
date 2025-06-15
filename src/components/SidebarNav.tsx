@@ -1,45 +1,37 @@
 
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Home, Users, TrendingUp, Calendar, Bell } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { Home, BarChart3, Calendar, Settings } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
-const navItems = [
-  { icon: Home, label: 'Dashboard', to: '/' },
-  { icon: Users, label: 'Clients', count: 156 },
-  { icon: TrendingUp, label: 'Analytics', to: '/analytics' },
-  { icon: Calendar, label: 'Calendar', to: '/calendar' },
-  { icon: Bell, label: 'Notifications', count: 3 },
+const navigationItems = [
+  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Settings', href: '#', icon: Settings },
 ];
 
-export function SidebarNav() {
-  const navigate = useNavigate();
-
+export const SidebarNav = () => {
   return (
-    <nav className="space-y-2">
-      {navItems.map((item, index) => (
-        <Button
-          key={index}
-          variant={item.to === window.location.pathname ? "default" : "ghost"}
-          className={`w-full justify-start ${
-            item.to === window.location.pathname
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={item.to ? () => navigate(item.to!) : undefined}
-        >
-          <item.icon className="h-5 w-5 mr-3" />
-          <span className="flex-1 text-left">{item.label}</span>
-          {item.count && (
-            <Badge
-              variant={item.to === window.location.pathname ? "secondary" : "outline"}
-              className={item.to === window.location.pathname ? "bg-blue-500 text-white" : ""}
-            >
-              {item.count}
-            </Badge>
-          )}
-        </Button>
-      ))}
+    <nav className="space-y-1">
+      {navigationItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <NavLink
+            key={item.name}
+            to={item.href}
+            className={({ isActive }) =>
+              `group rounded-lg px-3 py-2 text-sm font-medium flex items-center transition-colors ${
+                isActive
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`
+            }
+          >
+            <Icon className="mr-3 h-5 w-5 flex-shrink-0" />
+            {item.name}
+          </NavLink>
+        );
+      })}
     </nav>
   );
-}
+};
