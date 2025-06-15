@@ -1,6 +1,6 @@
 
 import { Client } from '@/types/client';
-import { Phone, Mail, Target, CheckCircle, Menu, FilePlus2, X } from 'lucide-react';
+import { Phone, Target, CheckCircle, FilePlus2, X, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import React from 'react';
 
@@ -30,20 +30,11 @@ export const ClientProfileActions = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onAction(client, 'text')}
-          className="rounded-xl border-2 border-gray-200 text-gray-700 bg-white hover:border-green-400 hover:bg-green-50 flex items-center px-4"
+          onClick={() => onAction(client, 'calendar')}
+          className="rounded-xl border-2 border-gray-200 text-gray-700 bg-white hover:border-indigo-400 hover:bg-indigo-50 flex items-center px-4"
         >
-          <Menu className="h-5 w-5 mr-2" />
-          <span className="font-semibold">Text</span>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onAction(client, 'email')}
-          className="rounded-xl border-2 border-gray-200 text-gray-700 bg-white hover:border-purple-400 hover:bg-purple-50 flex items-center px-4"
-        >
-          <Mail className="h-5 w-5 mr-2" />
-          <span className="font-semibold">Email</span>
+          <Calendar className="h-5 w-5 mr-2" />
+          <span className="font-semibold">Schedule</span>
         </Button>
         <Button
           variant="outline"

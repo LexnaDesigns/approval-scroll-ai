@@ -1,4 +1,6 @@
+
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/Sidebar';
 import { Client } from '@/types/client';
 import { useClientActivity } from '@/hooks/useClientActivity';
@@ -9,6 +11,7 @@ import { Header } from '@/components/Header';
 import { AppModals } from '@/components/AppModals';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { clients, isLoading, isError, error } = useClients();
 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -64,6 +67,9 @@ const Index = () => {
         break;
       case 'close':
         setShowCloseDealModal(true);
+        break;
+      case 'calendar':
+        navigate('/calendar');
         break;
       case 'kill':
         // Open kill reason modal instead of direct delete
