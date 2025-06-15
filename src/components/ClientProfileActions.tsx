@@ -1,4 +1,3 @@
-
 import { Client } from '@/types/client';
 import { Phone, Mail, Target, CheckCircle, Menu, FilePlus2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,7 @@ export const ClientProfileActions = ({ client, onAction }: ClientProfileActionsP
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           <Target className="h-4 w-4 mr-2" />
-          Present Options
+          Present Vehicle
         </Button>
         <Button
           onClick={() => onAction(client, 'close')}

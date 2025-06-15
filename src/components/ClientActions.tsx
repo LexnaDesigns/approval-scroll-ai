@@ -65,15 +65,15 @@ export const ClientActions = ({ client, onAction, hasManagerAlert, onClearAlert 
         <Button
           size="sm"
           onClick={() => onAction(client, 'present')}
-          className="bg-blue-600 hover:bg-blue-700 text-white h-7 px-2 text-xs"
+          className="bg-blue-600 hover:bg-blue-700 text-white h-7 px-3 text-xs"
         >
           <Target className="h-3 w-3 mr-1" />
-          Present
+          Present Vehicle
         </Button>
         <Button
           size="sm"
           onClick={() => onAction(client, 'close')}
-          className="bg-green-600 hover:bg-green-700 text-white h-7 px-2 text-xs"
+          className="bg-green-600 hover:bg-green-700 text-white h-7 px-3 text-xs"
         >
           <CheckCircle className="h-3 w-3 mr-1" />
           Close

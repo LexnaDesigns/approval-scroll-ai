@@ -12,6 +12,7 @@ import { Menu, Loader2 } from 'lucide-react';
 import { Client } from '@/types/client';
 import { useClientActivity } from '@/hooks/useClientActivity';
 import { toast } from '@/components/ui/use-toast';
+import { PresentVehicleModal } from '@/components/PresentVehicleModal';
 
 const mapRawClientToClient = (rawClient: any): Client => ({
   id: rawClient.id,
@@ -106,6 +107,7 @@ const Index = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showDocRequestModal, setShowDocRequestModal] = useState(false);
   const [showCloseDealModal, setShowCloseDealModal] = useState(false);
+  const [showPresentVehicleModal, setShowPresentVehicleModal] = useState(false);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -131,8 +133,7 @@ const Index = () => {
         setShowDocRequestModal(true);
         break;
       case 'present':
-        updateStageMutation.mutate({ clientId: client.id, newStage: 'Presenting Options' });
-        toast({ title: 'Stage Updated', description: `${client.name} is now in 'Presenting Options' stage.` });
+        setShowPresentVehicleModal(true);
         break;
       case 'close':
         setShowCloseDealModal(true);
@@ -228,6 +229,14 @@ const Index = () => {
           onClose={() => setSelectedClient(null)}
           onAction={handleClientAction}
           onUpdateStage={updateClientStage}
+        />
+      )}
+
+      {showPresentVehicleModal && activeClient && (
+        <PresentVehicleModal
+          client={activeClient}
+          isOpen={showPresentVehicleModal}
+          onClose={() => setShowPresentVehicleModal(false)}
         />
       )}
 
