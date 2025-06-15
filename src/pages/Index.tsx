@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Client } from '@/types/client';
@@ -168,3 +167,5 @@ const Index = () => {
 };
 
 import { KillReasonModal } from '@/components/KillReasonModal';
+
+export default Index;
