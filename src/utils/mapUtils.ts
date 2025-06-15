@@ -58,3 +58,21 @@ export const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2
   const distance = R * c;
   return Math.round(distance);
 };
+
+export const estimateDrivingTime = (distanceKm: number): string => {
+  // Estimate driving time based on average speed of 60 km/h for mixed driving
+  const hours = distanceKm / 60;
+  
+  if (hours < 1) {
+    const minutes = Math.round(hours * 60);
+    return `${minutes} min`;
+  } else if (hours < 2) {
+    const totalMinutes = Math.round(hours * 60);
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  } else {
+    const roundedHours = Math.round(hours * 2) / 2; // Round to nearest 0.5 hour
+    return `${roundedHours}h`;
+  }
+};

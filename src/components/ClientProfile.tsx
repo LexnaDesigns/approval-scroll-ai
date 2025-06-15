@@ -1,10 +1,11 @@
 
 import { Client } from '@/types/client';
-import { X, Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, MapPin, Briefcase, DollarSign } from 'lucide-react';
+import { X, Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, MapPin, Briefcase, DollarSign, Navigation, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ClientMap } from '@/components/ClientMap';
+import { geocodeAddress, calculateDistance, estimateDrivingTime } from '@/utils/mapUtils';
+import { useMemo } from 'react';
 
 interface ClientProfileProps {
   client: Client;
@@ -14,6 +15,28 @@ interface ClientProfileProps {
 }
 
 export const ClientProfile = ({ client, onClose, onAction, onUpdateStage }: ClientProfileProps) => {
+  const dealerAddress = '811 Gardiners Rd, Kingston, ON K7M 7E6';
+  
+  const distanceInfo = useMemo(() => {
+    const clientCoords = geocodeAddress(client.address);
+    const dealerCoords = geocodeAddress(dealerAddress);
+    
+    if (!clientCoords || !dealerCoords) {
+      return null;
+    }
+    
+    const distance = calculateDistance(
+      clientCoords.lat,
+      clientCoords.lng,
+      dealerCoords.lat,
+      dealerCoords.lng
+    );
+    
+    const drivingTime = estimateDrivingTime(distance);
+    
+    return { distance, drivingTime };
+  }, [client.address]);
+
   const getStageColor = (stage: string) => {
     switch (stage) {
       case 'New Lead': return 'bg-blue-500';
@@ -95,10 +118,22 @@ export const ClientProfile = ({ client, onClose, onAction, onUpdateStage }: Clie
                 </div>
               </div>
 
-              {/* Location Map */}
-              <div className="mb-6">
-                <ClientMap clientAddress={client.address} />
-              </div>
+              {/* Distance & Travel Info */}
+              {distanceInfo && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-3">Distance to Dealership</h3>
+                  <div className="bg-blue-50 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center space-x-3">
+                      <Navigation className="h-5 w-5 text-blue-600" />
+                      <span className="text-gray-700 font-medium">{distanceInfo.distance} km away</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Clock className="h-5 w-5 text-blue-600" />
+                      <span className="text-gray-700">Est. {distanceInfo.drivingTime} drive</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Employment Info */}
               <div className="mb-6">
