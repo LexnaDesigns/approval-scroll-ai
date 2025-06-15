@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ClientCard } from '@/components/ClientCard';
 import { ClientProfile } from '@/components/ClientProfile';
@@ -9,6 +10,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { Menu, X } from 'lucide-react';
 import { Client } from '@/types/client';
 import { mockClients } from '@/data/mockClients';
+import { useClientActivity } from '@/hooks/useClientActivity';
 
 const Index = () => {
   const [clients, setClients] = useState<Client[]>(mockClients);
@@ -19,6 +21,8 @@ const Index = () => {
   const [showCloseDealModal, setShowCloseDealModal] = useState(false);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const { hotLeads, managerAlerts, markAsApproved, clearManagerAlert } = useClientActivity(clients, setClients);
 
   const handleClientAction = (client: Client, action: string) => {
     setActiveClient(client);
@@ -35,6 +39,9 @@ const Index = () => {
         break;
       case 'docRequest':
         setShowDocRequestModal(true);
+        break;
+      case 'approve':
+        markAsApproved(client.id);
         break;
       case 'close':
         setShowCloseDealModal(true);
@@ -72,6 +79,20 @@ const Index = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900">🚗💥 THE APPROVAL BOARD</h1>
             <p className="text-sm text-gray-600">Social-Style CRM for Subprime Auto Finance</p>
+            {(hotLeads.size > 0 || managerAlerts.size > 0) && (
+              <div className="flex justify-center space-x-4 mt-1">
+                {hotLeads.size > 0 && (
+                  <span className="text-xs text-orange-600 font-medium animate-pulse">
+                    🔥 {hotLeads.size} Hot Lead{hotLeads.size > 1 ? 's' : ''}
+                  </span>
+                )}
+                {managerAlerts.size > 0 && (
+                  <span className="text-xs text-red-600 font-medium animate-pulse">
+                    🚨 {managerAlerts.size} Alert{managerAlerts.size > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="lg:hidden w-10"></div>
@@ -86,6 +107,9 @@ const Index = () => {
                 client={client}
                 onAction={handleClientAction}
                 onSelect={setSelectedClient}
+                isHotLead={hotLeads.has(client.id)}
+                hasManagerAlert={managerAlerts.has(client.id)}
+                onClearAlert={() => clearManagerAlert(client.id)}
               />
             ))}
           </div>

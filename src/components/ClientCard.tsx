@@ -1,6 +1,6 @@
 
 import { Client } from '@/types/client';
-import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull } from 'lucide-react';
+import { Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -8,9 +8,19 @@ interface ClientCardProps {
   client: Client;
   onAction: (client: Client, action: string) => void;
   onSelect: (client: Client) => void;
+  isHotLead?: boolean;
+  hasManagerAlert?: boolean;
+  onClearAlert?: () => void;
 }
 
-export const ClientCard = ({ client, onAction, onSelect }: ClientCardProps) => {
+export const ClientCard = ({ 
+  client, 
+  onAction, 
+  onSelect, 
+  isHotLead = false, 
+  hasManagerAlert = false,
+  onClearAlert 
+}: ClientCardProps) => {
   const getStageColor = (stage: string) => {
     switch (stage) {
       case 'New Lead': return 'bg-blue-500';
@@ -28,16 +38,42 @@ export const ClientCard = ({ client, onAction, onSelect }: ClientCardProps) => {
     return 'text-red-600';
   };
 
+  const cardClasses = `
+    bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden 
+    hover:shadow-xl transition-all duration-300 animate-fade-in
+    ${isHotLead ? 'animate-pulse ring-2 ring-orange-400 ring-opacity-75' : ''}
+    ${hasManagerAlert ? 'ring-2 ring-red-400 ring-opacity-75' : ''}
+  `;
+
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 animate-fade-in">
+    <div className={cardClasses}>
       {/* Header */}
       <div 
-        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors relative"
         onClick={() => onSelect(client)}
       >
-        <div className="flex items-center justify-between mb-3">
+        {/* Manager Alert Badge */}
+        {hasManagerAlert && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className="bg-red-500 text-white animate-pulse">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Manager Review
+            </Badge>
+          </div>
+        )}
+
+        {/* Hot Lead Indicator */}
+        {isHotLead && (
+          <div className="absolute top-2 left-2 z-10">
+            <Badge className="bg-orange-500 text-white animate-pulse">
+              🔥 Ready to Present
+            </Badge>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between mb-3 mt-8">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+            <div className={`w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg ${isHotLead ? 'animate-pulse' : ''}`}>
               {client.name.split(' ').map(n => n[0]).join('')}
             </div>
             <div>
@@ -56,6 +92,19 @@ export const ClientCard = ({ client, onAction, onSelect }: ClientCardProps) => {
         <p className="text-gray-700 text-sm mb-3 leading-relaxed">
           {client.aiSummary}
         </p>
+
+        {/* Recent Communication Indicator */}
+        {client.communications.length > 0 && (
+          <div className="mb-3">
+            <div className="text-xs text-gray-500 flex items-center space-x-2">
+              <MessageSquare className="h-3 w-3" />
+              <span>
+                Last contact: {new Date(client.communications[client.communications.length - 1].timestamp).toLocaleString()}
+              </span>
+              <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        )}
 
         {/* Document Status */}
         <div className="flex items-center space-x-4 mb-3">
@@ -140,6 +189,19 @@ export const ClientCard = ({ client, onAction, onSelect }: ClientCardProps) => {
           >
             <FileText className="h-4 w-4" />
           </Button>
+          {hasManagerAlert && onClearAlert && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClearAlert();
+              }}
+              className="hover:bg-red-50 hover:border-red-300 text-red-600"
+            >
+              <AlertTriangle className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         
         <div className="flex space-x-2">
@@ -150,6 +212,13 @@ export const ClientCard = ({ client, onAction, onSelect }: ClientCardProps) => {
           >
             <Target className="h-4 w-4 mr-1" />
             Present
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => onAction(client, 'approve')}
+            className="bg-orange-600 hover:bg-orange-700 text-white"
+          >
+            ✓ Approve
           </Button>
           <Button
             size="sm"
