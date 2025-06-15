@@ -1,4 +1,3 @@
-
 import { Client, Communication } from '@/types/client';
 
 export interface MessageUpdate {
@@ -49,6 +48,7 @@ const managerAlertTriggers = [
 export class MessageSimulator {
   private intervalId: NodeJS.Timeout | null = null;
   private onUpdate: (update: MessageUpdate) => void;
+  private managerAlertsSent = 0;
 
   constructor(onUpdate: (update: MessageUpdate) => void) {
     this.onUpdate = onUpdate;
@@ -87,9 +87,17 @@ export class MessageSimulator {
     const response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
 
     // Check if this message needs manager attention
-    const needsManagerAttention = managerAlertTriggers.some(trigger => 
+    let needsManagerAttention = managerAlertTriggers.some(trigger => 
       message.toLowerCase().includes(trigger)
     );
+
+    if (needsManagerAttention) {
+      if (this.managerAlertsSent < 2) {
+        this.managerAlertsSent++;
+      } else {
+        needsManagerAttention = false;
+      }
+    }
 
     // Determine if this should make the lead "hot" - increased chance for testing
     const isHotLead = client.stage === 'Docs In' && Math.random() > 0.4;
