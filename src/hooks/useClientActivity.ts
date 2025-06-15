@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Client } from '@/types/client';
 import { MessageSimulator, MessageUpdate } from '@/services/messageSimulator';
@@ -11,50 +12,34 @@ export const useClientActivity = (clients: Client[]) => {
   const [managerAlerts, setManagerAlerts] = useState<Set<string>>(new Set());
 
   const handleMessageUpdate = useCallback(async (update: MessageUpdate) => {
-    // Persist communication to Supabase
-    const { error } = await supabase.from('communications').insert({
-        id: update.communication.id,
-        client_id: update.clientId,
-        type: update.communication.type,
-        content: update.communication.content,
-        timestamp: update.communication.timestamp,
-        direction: update.communication.direction,
-    });
+    // Try to persist communication to Supabase, but don't block on errors
+    try {
+      const { error } = await supabase.from('communications').insert({
+          id: update.communication.id,
+          client_id: update.clientId,
+          type: update.communication.type,
+          content: update.communication.content,
+          timestamp: update.communication.timestamp,
+          direction: update.communication.direction,
+      });
 
-    if (error) {
-        toast({
-            title: "Error saving message",
-            description: error.message,
-            variant: "destructive",
-        });
+      if (error) {
         console.error("Error inserting communication:", error);
-        return;
-    }
-    
-    // Invalidate query to refetch data
-    await queryClient.invalidateQueries({ queryKey: ['clients'] });
-
-    if (update.needsManagerAttention) {
-      const client = clients.find(c => c.id === update.clientId);
-      if (client) {
-        toast({
-          title: "🚨 Manager Attention Required",
-          description: `${client.name} needs your review - they're asking about pricing/terms`,
-          duration: 8000,
-        });
+        // Don't show error toast to user, just log it
+      } else {
+        // Only invalidate query if successful
+        await queryClient.invalidateQueries({ queryKey: ['clients'] });
       }
-    }
-    
-    // Handle manager alerts
-    if (update.needsManagerAttention) {
-      setManagerAlerts(prev => new Set([...prev, update.clientId]));
+    } catch (error) {
+      console.error("Failed to save communication:", error);
+      // Continue without blocking the UI
     }
 
     // Handle hot leads
     if (update.isHotLead) {
       setHotLeads(prev => new Set([...prev, update.clientId]));
     }
-  }, [clients, queryClient]);
+  }, [queryClient]);
 
   // Use a ref to give the simulator access to the latest clients array
   // without re-triggering the useEffect that creates the simulator.
