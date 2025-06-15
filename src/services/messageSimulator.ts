@@ -1,3 +1,4 @@
+
 import { Client, Communication } from '@/types/client';
 
 export interface MessageUpdate {
@@ -54,15 +55,15 @@ export class MessageSimulator {
     this.onUpdate = onUpdate;
   }
 
-  start(clients: Client[]) {
+  start(getClients: () => Client[]) {
     if (this.intervalId) return;
 
     // Send first message immediately after 5 seconds, then every 45 seconds
     setTimeout(() => {
-      this.simulateMessage(clients);
+      this.simulateMessage(getClients());
       
       this.intervalId = setInterval(() => {
-        this.simulateMessage(clients);
+        this.simulateMessage(getClients());
       }, 45000); // 45 seconds for demo
     }, 5000); // 5 second initial delay
   }

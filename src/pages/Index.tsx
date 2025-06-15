@@ -41,7 +41,7 @@ const Index = () => {
         setShowDocRequestModal(true);
         break;
       case 'approve':
-        markAsApproved(client.id);
+        markAsApproved(client.id, client.name);
         break;
       case 'close':
         setShowCloseDealModal(true);
