@@ -84,7 +84,7 @@ export const SidebarLiveFeed = ({ clients, onClientSelect }: SidebarLiveFeedProp
                       {getTimeAgo(comm.timestamp)}
                     </p>
                   </div>
-                  {comm.direction === 'incoming' && (
+                  {comm.direction === 'inbound' && (
                     <AlertTriangle className="h-3 w-3 text-orange-500 flex-shrink-0" />
                   )}
                 </div>
