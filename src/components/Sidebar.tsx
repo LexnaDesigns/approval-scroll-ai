@@ -1,20 +1,14 @@
 
-import { Phone, MessageSquare, CheckCircle, Skull, Settings, Bell, Home, Users, TrendingUp, Calendar, Car } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useClients } from '@/hooks/useClients';
 import { useClientActivity } from '@/hooks/useClientActivity';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Client } from '@/types/client';
 import { useNavigate } from "react-router-dom";
-
-const repStats = [
-  { name: 'You', value: 78, color: 'bg-blue-500' },
-  { name: 'Anya', value: 62, color: 'bg-green-400' },
-  { name: 'Carlos', value: 55, color: 'bg-orange-400' },
-  { name: 'Tam', value: 44, color: 'bg-purple-400' },
-  { name: 'Taylor', value: 33, color: 'bg-pink-400' },
-];
+import { SidebarNav } from './SidebarNav';
+import { SidebarAnalyticsSummary } from './SidebarAnalyticsSummary';
+import { SidebarLiveFeed } from './SidebarLiveFeed';
 
 interface SidebarProps {
   onClose: () => void;
@@ -32,14 +26,6 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
     dealsClosed: 8,
     killCount: 12
   };
-
-  const navItems = [
-    { icon: Home, label: 'Dashboard', to: '/' },
-    { icon: Users, label: 'Clients', count: 156 },
-    { icon: TrendingUp, label: 'Analytics', to: '/analytics' },
-    { icon: Calendar, label: 'Calendar', to: '/calendar' },
-    { icon: Bell, label: 'Notifications', count: 3 },
-  ];
 
   // -- SIDEBAR LIVE FEED LOGIC (from Analytics) --
   const getRecentActivity = () => {
@@ -95,65 +81,12 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
     <div className="w-[22rem] bg-white h-screen shadow-lg border-r border-gray-200 flex flex-col fixed left-0 top-0 z-30">
       {/* Navigation */}
       <div className="p-6 border-b border-gray-200">
-        <nav className="space-y-2">
-          {navItems.map((item, index) => (
-            <Button
-              key={index}
-              variant={item.to === window.location.pathname ? "default" : "ghost"}
-              className={`w-full justify-start ${
-                item.to === window.location.pathname
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={item.to ? () => navigate(item.to!) : undefined}
-            >
-              <item.icon className="h-5 w-5 mr-3" />
-              <span className="flex-1 text-left">{item.label}</span>
-              {item.count && (
-                <Badge
-                  variant={item.to === window.location.pathname ? "secondary" : "outline"}
-                  className={item.to === window.location.pathname ? "bg-blue-500 text-white" : ""}
-                >
-                  {item.count}
-                </Badge>
-              )}
-            </Button>
-          ))}
-        </nav>
+        <SidebarNav />
       </div>
 
       {/* Analytics Summary with icons */}
       <div className="p-6 border-b border-gray-200">
-        <div className="grid grid-cols-2 gap-3 mt-2">
-          <div className="bg-green-50 rounded-lg p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Phone className="h-4 w-4 text-green-600 mr-1" />
-            </div>
-            <div className="text-2xl font-bold text-green-700">{stats.callsMade}</div>
-            <div className="text-xs text-green-600">Calls</div>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <MessageSquare className="h-4 w-4 text-blue-600 mr-1" />
-            </div>
-            <div className="text-2xl font-bold text-blue-700">{stats.textsSent}</div>
-            <div className="text-xs text-blue-600">Texts</div>
-          </div>
-          <div className="bg-emerald-50 rounded-lg p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <CheckCircle className="h-4 w-4 text-emerald-600 mr-1" />
-            </div>
-            <div className="text-2xl font-bold text-emerald-700">{stats.dealsClosed}</div>
-            <div className="text-xs text-emerald-600">Deals</div>
-          </div>
-          <div className="bg-red-50 rounded-lg p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Skull className="h-4 w-4 text-red-600 mr-1" />
-            </div>
-            <div className="text-2xl font-bold text-red-700">{stats.killCount}</div>
-            <div className="text-xs text-red-600">Killed</div>
-          </div>
-        </div>
+        <SidebarAnalyticsSummary stats={stats} />
       </div>
 
       {/* Live Activity Feed */}
@@ -162,68 +95,12 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <h3 className="font-semibold text-base text-gray-900">Live Feed</h3>
         </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 shadow-sm min-h-[160px] max-h-[265px] overflow-auto">
-          <div className="space-y-3">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start space-x-2 p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors relative border group"
-                  onClick={() => onClientSelect && onClientSelect(activity.client)}
-                >
-                  {/* Activity indicators */}
-                  <div className="flex-shrink-0 relative">
-                    <div className="text-base">
-                      {getActivityIcon(activity.type, activity.direction)}
-                    </div>
-                    {activity.isHotLead && (
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                    )}
-                    {activity.hasAlert && (
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-xs font-medium text-gray-900 truncate">
-                        {activity.client.name}
-                      </span>
-                      <span className="text-[10px] text-gray-500">
-                        {getTimeSince(activity.timestamp)}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-700 line-clamp-2">
-                      {activity.direction === 'inbound' ? (
-                        <>📨 {activity.content}</>
-                      ) : activity.type === 'ai' ? (
-                        <>🤖 {activity.content}</>
-                      ) : (
-                        <>📤 {activity.content}</>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-1 mt-1">
-                      {activity.isHotLead && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] bg-orange-100 text-orange-700">
-                          🔥 Hot
-                        </span>
-                      )}
-                      {activity.hasAlert && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] bg-red-100 text-red-700">
-                          🚨 Alert
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-4 text-gray-500 text-xs">
-                <MessageSquare className="h-5 w-5 mx-auto mb-1 opacity-50" />
-                No recent activity
-              </div>
-            )}
-          </div>
-        </div>
+        <SidebarLiveFeed
+          recentActivity={recentActivity}
+          onClientSelect={onClientSelect}
+          getActivityIcon={getActivityIcon}
+          getTimeSince={getTimeSince}
+        />
       </div>
 
       {/* Settings */}
