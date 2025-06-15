@@ -40,27 +40,27 @@ export const PresentVehicleModal = ({ client, isOpen, onClose }: PresentVehicleM
     setDecodingError(null);
     setDecodedInfo(null);
     try {
-      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
+      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${vin}?format=json`);
       if (!response.ok) {
         throw new Error('Failed to fetch VIN data.');
       }
       const data = await response.json();
-      const results = data.Results;
-
-      const errorResult = results.find(r => r.Variable === 'Error Text' && r.Value && r.Value !== 'Not Applicable' && r.Value.trim() !== '');
-      if (errorResult) {
-        throw new Error(errorResult.Value || 'Invalid VIN');
+      
+      if (!data.Results || data.Results.length === 0) {
+        throw new Error('Invalid VIN or no data found.');
       }
 
-      const info: DecodedVin = results
-        .filter(item => ['Make', 'Model', 'Model Year'].includes(item.Variable) && item.Value)
-        .reduce((acc, item) => {
-          acc[item.Variable.replace(/\s/g, '')] = item.Value;
-          return acc;
-        }, {} as DecodedVin);
+      const vehicleData = data.Results[0];
+
+      const info: DecodedVin = {
+        Make: vehicleData.Make,
+        Model: vehicleData.Model,
+        ModelYear: vehicleData.ModelYear,
+      };
 
       if (!info.Make || !info.Model || !info.ModelYear) {
-        throw new Error("Could not decode all vehicle details. Please check the VIN and try again.");
+        const error = (vehicleData.ErrorText || 'Could not decode vehicle details. Please check VIN.').split(';')[0];
+        throw new Error(error);
       }
       
       setDecodedInfo(info);
