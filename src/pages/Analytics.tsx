@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BarChart3, Phone, MessageSquare, CheckCircle, Skull } from "lucide-react";
 import { useClients } from "@/hooks/useClients";
@@ -26,64 +25,7 @@ export default function Analytics() {
     killCount: 12
   };
 
-  // Get recent activity from all clients
-  const getRecentActivity = () => {
-    const activities = [];
-
-    clients.forEach(client => {
-      // Add recent communications
-      const recentComms = client.communications
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-        .slice(0, 2);
-
-      recentComms.forEach(comm => {
-        activities.push({
-          id: `${client.id}-${comm.id}`,
-          client,
-          type: comm.type,
-          content: comm.content,
-          timestamp: comm.timestamp,
-          direction: comm.direction,
-          isHotLead: hotLeads.has(client.id),
-          hasAlert: managerAlerts.has(client.id)
-        });
-      });
-    });
-
-    return activities
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 18);
-  };
-
-  const recentActivity = getRecentActivity();
-
-  const getActivityIcon = (type: string, direction: string) => {
-    if (type === 'text') {
-      return direction === 'inbound' ? '📱' : '💬';
-    }
-    if (type === 'ai') {
-      return '🤖';
-    }
-    if (type === 'call') {
-      return '📞';
-    }
-    return '💬';
-  };
-
-  const getTimeSince = (timestamp: string) => {
-    const now = new Date().getTime();
-    const time = new Date(timestamp).getTime();
-    const diff = now - time;
-
-    const minutes = Math.floor(diff / (1000 * 60));
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-
-    return `${Math.floor(hours / 24)}d ago`;
-  };
+  // The live feed has been moved to the sidebar per user request
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-2">
@@ -146,76 +88,6 @@ export default function Analytics() {
               <span className="font-semibold text-red-700">Killed</span>
             </div>
             <div className="text-3xl font-bold text-red-700">{stats.killCount}</div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <h3 className="font-semibold text-xl text-gray-900">Live Activity Feed</h3>
-        </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-2xl shadow-md p-4 mb-8 min-h-[440px] max-h-[600px] overflow-auto">
-          <div className="space-y-4">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity) => (
-                <div 
-                  key={activity.id}
-                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors relative border"
-                >
-                  {/* Activity indicators */}
-                  <div className="flex-shrink-0 relative">
-                    <div className="text-lg">
-                      {getActivityIcon(activity.type, activity.direction)}
-                    </div>
-                    {activity.isHotLead && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-                    )}
-                    {activity.hasAlert && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {activity.client.name}
-                      </p>
-                      <span className="text-xs text-gray-500">
-                        {getTimeSince(activity.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-700 line-clamp-2">
-                      {activity.direction === 'inbound' ? (
-                        <>📨 {activity.content}</>
-                      ) : activity.type === 'ai' ? (
-                        <>🤖 {activity.content}</>
-                      ) : (
-                        <>📤 {activity.content}</>
-                      )}
-                    </p>
-                    {/* Activity badges */}
-                    <div className="flex items-center space-x-2 mt-2">
-                      {activity.isHotLead && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
-                          🔥 Hot
-                        </span>
-                      )}
-                      {activity.hasAlert && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">
-                          🚨 Alert
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No recent activity</p>
-                <p className="text-xs">Activity will appear here as it happens</p>
-              </div>
-            )}
           </div>
         </div>
       </section>
