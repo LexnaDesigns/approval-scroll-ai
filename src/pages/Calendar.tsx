@@ -45,22 +45,6 @@ export default function CalendarPage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
-  // Highlight today in calendar with custom classes
-  const calendarProps = {
-    mode: "single",
-    selected: selectedDate,
-    onSelect: setSelectedDate,
-    className: cn(
-      "p-3 pointer-events-auto rounded-3xl mt-6 shadow-xl border-0 bg-gradient-to-b from-blue-50/80 to-white",
-      "calendar-fun grid"
-    ),
-    modifiersClassNames: {
-      today: "bg-blue-600 text-white rounded-full font-bold shadow",
-      selected: "border-2 border-blue-500",
-    },
-    showOutsideDays: true
-  };
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-100/40 via-white to-purple-100/40 flex flex-col items-center px-0 md:px-6 py-6">
       <div className="w-full max-w-4xl flex flex-col gap-4">
@@ -110,7 +94,20 @@ export default function CalendarPage() {
         </div>
         {/* Fun Calendar */}
         <div className="relative rounded-3xl overflow-x-auto shadow-xl border-0 bg-white/60 p-2">
-          <Calendar {...calendarProps} />
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            className={cn(
+              "p-3 pointer-events-auto rounded-3xl mt-6 shadow-xl border-0 bg-gradient-to-b from-blue-50/80 to-white",
+              "calendar-fun grid"
+            )}
+            modifiersClassNames={{
+              today: "bg-blue-600 text-white rounded-full font-bold shadow",
+              selected: "border-2 border-blue-500",
+            }}
+            showOutsideDays
+          />
         </div>
       </div>
       {/* Add Event Modal */}
