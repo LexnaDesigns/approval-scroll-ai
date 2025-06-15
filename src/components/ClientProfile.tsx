@@ -4,6 +4,7 @@ import { X, Phone, MessageSquare, Mail, FileText, Target, CheckCircle, Skull, Ma
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ClientMap } from '@/components/ClientMap';
 
 interface ClientProfileProps {
   client: Client;
@@ -92,6 +93,11 @@ export const ClientProfile = ({ client, onClose, onAction, onUpdateStage }: Clie
                     <span className="text-gray-700">{client.address}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Location Map */}
+              <div className="mb-6">
+                <ClientMap clientAddress={client.address} />
               </div>
 
               {/* Employment Info */}
