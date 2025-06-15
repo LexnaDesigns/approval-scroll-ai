@@ -11,7 +11,7 @@ import { AppModals } from '@/components/AppModals';
 
 const Index = () => {
   const { clients, isLoading, isError, error } = useClients();
-  
+
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showTextModal, setShowTextModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -19,15 +19,34 @@ const Index = () => {
   const [showCloseDealModal, setShowCloseDealModal] = useState(false);
   const [showPresentVehicleModal, setShowPresentVehicleModal] = useState(false);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
-  
+
+  // Liked client state (pin liked to top)
+  const [likedClientIds, setLikedClientIds] = useState<Set<string>>(new Set());
+
+  // For "Kill" modal functionality
+  const [killModal, setKillModal] = useState<{ open: boolean, client: Client | null }>({ open: false, client: null });
+
   const { hotLeads, managerAlerts, clearManagerAlert } = useClientActivity(clients);
-  
+
   const updateStageMutation = useUpdateClientStage();
   const deleteClientMutation = useDeleteClient();
 
+  const handleLikeClient = (client: Client) => {
+    setLikedClientIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(client.id)) {
+        newSet.delete(client.id);
+      } else {
+        newSet.add(client.id);
+      }
+      return newSet;
+    });
+  };
+  const isLikedFor = (client: Client) => likedClientIds.has(client.id);
+
   const handleClientAction = (client: Client, action: string) => {
     setActiveClient(client);
-    
+
     switch (action) {
       case 'call':
         window.open(`tel:${client.phone}`, '_self');
@@ -48,10 +67,8 @@ const Index = () => {
         setShowCloseDealModal(true);
         break;
       case 'kill':
-        deleteClientMutation.mutate(client.id);
-        if (selectedClient?.id === client.id) {
-            setSelectedClient(null);
-        }
+        // Open kill reason modal instead of direct delete
+        setKillModal({ open: true, client });
         break;
     }
   };
@@ -59,7 +76,7 @@ const Index = () => {
   const updateClientStage = (clientId: string, newStage: Client['stage']) => {
     updateStageMutation.mutate({ clientId, newStage });
   };
-  
+
   const handleCompleteCloseDeal = (clientId: string) => {
     updateClientStage(clientId, 'Delivered');
     setShowCloseDealModal(false);
@@ -67,6 +84,17 @@ const Index = () => {
 
   const handleSidebarClientSelect = (client: Client) => {
     setSelectedClient(client);
+  };
+
+  // Confirm kill lead (with reason)
+  const handleKillLead = (reason: string) => {
+    if (killModal.client) {
+      deleteClientMutation.mutate(killModal.client.id);
+      setKillModal({ open: false, client: null });
+      // Optionally, show reason in toast:
+      // import { toast } from '@/hooks/use-toast';
+      // toast({ title: `Removed: ${killModal.client.name}`, description: `Reason: ${reason}`, variant: "destructive" });
+    }
   };
 
   return (
@@ -97,10 +125,14 @@ const Index = () => {
             isError={isError}
             error={error as Error | null}
             onAction={handleClientAction}
-            onSelect={setSelectedClient}
+            onSelect={(client: Client) => setSelectedClient(client)}
             hotLeads={hotLeads}
             managerAlerts={managerAlerts}
             clearManagerAlert={clearManagerAlert}
+            // Add for liking/pinning
+            likedClientIds={likedClientIds}
+            onLikeClient={handleLikeClient}
+            isLikedFor={isLikedFor}
           />
         </main>
       </div>
@@ -123,8 +155,16 @@ const Index = () => {
         onCloseCloseDealModal={() => setShowCloseDealModal(false)}
         onCompleteCloseDeal={handleCompleteCloseDeal}
       />
+
+      {/* KILL Reason Modal */}
+      <KillReasonModal
+        isOpen={killModal.open}
+        client={killModal.client}
+        onCancel={() => setKillModal({ open: false, client: null })}
+        onConfirm={handleKillLead}
+      />
     </div>
   );
 };
 
-export default Index;
+import { KillReasonModal } from '@/components/KillReasonModal';

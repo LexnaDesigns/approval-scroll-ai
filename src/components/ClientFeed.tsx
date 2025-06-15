@@ -1,4 +1,3 @@
-
 import { Client } from '@/types/client';
 import { ClientCard } from '@/components/ClientCard';
 import { Loader2 } from 'lucide-react';
@@ -25,7 +24,12 @@ export const ClientFeed = ({
   hotLeads,
   managerAlerts,
   clearManagerAlert
-}: ClientFeedProps) => {
+  // Accept these new props:
+}: ClientFeedProps & {
+  likedClientIds?: Set<string>;
+  onLikeClient?: (client: Client) => void;
+  isLikedFor?: (client: Client) => boolean;
+}) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-10">
@@ -43,17 +47,30 @@ export const ClientFeed = ({
     );
   }
 
+  // If we have a likedClients set, show liked ones on top
+  let sortedClients = clients;
+  if (typeof (onSelect as any)?.likedClientIds === "object") {
+    const likeIds = Array.from((onSelect as any).likedClientIds || []);
+    sortedClients = [
+      ...clients.filter(c => likeIds.includes(c.id)),
+      ...clients.filter(c => !likeIds.includes(c.id)),
+    ];
+  }
+
   return (
     <div className="space-y-4">
-      {clients.map((client) => (
+      {sortedClients.map((client) => (
         <ClientCard
           key={client.id}
           client={client}
           onAction={onAction}
-          onSelect={onSelect}
+          onSelect={(c: Client) => onSelect(c)}
           isHotLead={hotLeads.has(client.id)}
           hasManagerAlert={managerAlerts.has(client.id)}
           onClearAlert={() => clearManagerAlert(client.id)}
+          // Pass like state/handler down
+          isLiked={typeof (onSelect as any)?.isLikedFor === 'function' ? (onSelect as any).isLikedFor(client) : undefined}
+          onLike={typeof (onSelect as any)?.onLikeClient === 'function' ? (onSelect as any).onLikeClient : undefined}
         />
       ))}
     </div>

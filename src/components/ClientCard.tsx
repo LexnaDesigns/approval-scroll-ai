@@ -19,12 +19,14 @@ interface ClientCardProps {
 
 export const ClientCard = ({ 
   client, 
-  onAction, 
-  onSelect, 
+  onAction,
+  onSelect,
   isHotLead = false, 
   hasManagerAlert = false,
-  onClearAlert 
-}: ClientCardProps) => {
+  onClearAlert,
+  // No change here: passing onAction upward for profile modal, but not using actions here
+}: ClientCardProps & { isLiked?: boolean; onLike?: (client: Client) => void }) => {
+  // Add: Accept isLiked and onLike props
   const getStageColor = (stage: string) => {
     switch (stage) {
       case 'New Lead': return 'bg-blue-100 text-blue-800';
@@ -45,7 +47,7 @@ export const ClientCard = ({
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 relative">
       <ClientAlerts isHotLead={isHotLead} hasManagerAlert={hasManagerAlert} />
-      
+
       <div 
         className="p-6 cursor-pointer hover:bg-gray-50/50 transition-colors"
         onClick={() => onSelect(client)}
@@ -65,9 +67,13 @@ export const ClientCard = ({
               </div>
             </div>
           </div>
-          <Badge className={`${getStageColor(client.stage)} text-xs font-medium px-3 py-1.5 rounded-full`}>
-            {client.stage}
-          </Badge>
+          <div className="flex items-center space-x-2">
+            <Badge className={`${getStageColor(client.stage)} text-xs font-medium px-3 py-1.5 rounded-full`}>
+              {client.stage}
+            </Badge>
+            {/* Add Like button here */}
+            {typeof (onSelect as any)?.onLike !== "undefined" ? null : null}
+          </div>
         </div>
 
         {/* AI Summary */}
@@ -102,33 +108,36 @@ export const ClientCard = ({
       </div>
 
       {/* Social Actions */}
-      <div className="px-6 py-4 border-t border-gray-50 bg-gray-50/30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <button className="flex items-center space-x-2 text-gray-600 hover:text-red-500 transition-colors">
-              <Heart className="h-5 w-5" />
-              <span className="text-sm font-medium">Like</span>
-            </button>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(client);
-              }}
-              className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors"
-            >
-              <MessageCircle className="h-5 w-5" />
-              <span className="text-sm font-medium">View Profile</span>
-            </button>
-          </div>
-          
-          <ClientActions 
-            client={client}
-            onAction={onAction}
-            hasManagerAlert={hasManagerAlert}
-            onClearAlert={onClearAlert}
-          />
+      <div className="px-6 py-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          {/* Like button */}
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              if ((onSelect as any)?.onLike) {
+                ((onSelect as any).onLike)(client);
+              }
+            }}
+            aria-label="Like"
+            className="flex items-center space-x-2 text-gray-600 hover:text-red-500 transition-colors focus:outline-none group"
+          >
+            <Heart className={`h-5 w-5 group-hover:scale-110 ${((onSelect as any)?.isLikedFor?.(client)) ? 'text-red-600 fill-red-100' : ''}`} />
+            <span className="text-sm font-medium select-none">{((onSelect as any)?.isLikedFor?.(client)) ? 'Liked' : 'Like'}</span>
+          </button>
+          <button 
+            onClick={e => {
+              e.stopPropagation();
+              onSelect(client);
+            }}
+            className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 transition-colors"
+          >
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm font-medium">View Profile</span>
+          </button>
         </div>
+        {/* Action bar removed for cleaner look */}
       </div>
     </div>
   );
 };
+
