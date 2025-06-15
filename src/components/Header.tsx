@@ -1,8 +1,6 @@
 
-import { Search, Bell } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -38,9 +36,9 @@ export const Header = ({ onMenuClick, hotLeadsCount, managerAlertsCount }: Heade
           </div>
         </div>
 
-        {/* Right side - Notifications and Stats */}
+        {/* Right side - Profile Avatar */}
         <div className="flex items-center space-x-4">
-          {/* Activity Stats */}
+          {/* Activity Stats - showing live counts */}
           {(hotLeadsCount > 0 || managerAlertsCount > 0) && (
             <div className="flex items-center space-x-3">
               {hotLeadsCount > 0 && (
@@ -61,16 +59,6 @@ export const Header = ({ onMenuClick, hotLeadsCount, managerAlertsCount }: Heade
               )}
             </div>
           )}
-
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5" />
-            {(hotLeadsCount + managerAlertsCount) > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
-                {hotLeadsCount + managerAlertsCount}
-              </Badge>
-            )}
-          </Button>
 
           {/* Profile Avatar */}
           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">

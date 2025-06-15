@@ -2,12 +2,20 @@
 import { BarChart3, Phone, MessageSquare, CheckCircle, Skull, Settings, Bell, Home, Users, TrendingUp, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useClients } from '@/hooks/useClients';
+import { useClientActivity } from '@/hooks/useClientActivity';
+import { useState } from 'react';
+import { Client } from '@/types/client';
 
 interface SidebarProps {
   onClose: () => void;
+  onClientSelect?: (client: Client) => void;
 }
 
-export const Sidebar = ({ onClose }: SidebarProps) => {
+export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
+  const { clients } = useClients();
+  const { hotLeads, managerAlerts } = useClientActivity(clients);
+  
   const stats = {
     callsMade: 47,
     textsSent: 123,
@@ -22,6 +30,71 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
     { icon: Calendar, label: 'Calendar' },
     { icon: Bell, label: 'Notifications', count: 3 },
   ];
+
+  // Get recent activity from all clients
+  const getRecentActivity = () => {
+    const activities = [];
+    
+    clients.forEach(client => {
+      // Add recent communications
+      const recentComms = client.communications
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 2);
+      
+      recentComms.forEach(comm => {
+        activities.push({
+          id: `${client.id}-${comm.id}`,
+          client,
+          type: comm.type,
+          content: comm.content,
+          timestamp: comm.timestamp,
+          direction: comm.direction,
+          isHotLead: hotLeads.has(client.id),
+          hasAlert: managerAlerts.has(client.id)
+        });
+      });
+    });
+
+    return activities
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 8);
+  };
+
+  const recentActivity = getRecentActivity();
+
+  const handleActivityClick = (activity: any) => {
+    if (onClientSelect) {
+      onClientSelect(activity.client);
+    }
+  };
+
+  const getActivityIcon = (type: string, direction: string) => {
+    if (type === 'text') {
+      return direction === 'inbound' ? '📱' : '💬';
+    }
+    if (type === 'ai') {
+      return '🤖';
+    }
+    if (type === 'call') {
+      return '📞';
+    }
+    return '💬';
+  };
+
+  const getTimeSince = (timestamp: string) => {
+    const now = new Date().getTime();
+    const time = new Date(timestamp).getTime();
+    const diff = now - time;
+    
+    const minutes = Math.floor(diff / (1000 * 60));
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    
+    return `${Math.floor(hours / 24)}d ago`;
+  };
 
   return (
     <div className="w-64 bg-white h-screen shadow-lg border-r border-gray-200 flex flex-col fixed left-0 top-0 z-30">
@@ -95,34 +168,76 @@ export const Sidebar = ({ onClose }: SidebarProps) => {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Live Activity Feed */}
       <div className="p-6 flex-1 overflow-auto">
-        <h3 className="font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        <div className="flex items-center space-x-2 mb-4">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <h3 className="font-semibold text-gray-900">Live Activity Feed</h3>
+        </div>
         
-        <div className="space-y-3">
-          <div className="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
-            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-orange-800 font-medium">Michael Chen uploaded documents</p>
-              <p className="text-xs text-orange-600">2 minutes ago</p>
+        <div className="space-y-3 max-h-96 overflow-auto">
+          {recentActivity.length > 0 ? (
+            recentActivity.map((activity) => (
+              <div 
+                key={activity.id}
+                onClick={() => handleActivityClick(activity)}
+                className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer transition-colors relative"
+              >
+                {/* Activity indicators */}
+                <div className="flex-shrink-0 relative">
+                  <div className="text-lg">
+                    {getActivityIcon(activity.type, activity.direction)}
+                  </div>
+                  {activity.isHotLead && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                  )}
+                  {activity.hasAlert && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {activity.client.name}
+                    </p>
+                    <span className="text-xs text-gray-500">
+                      {getTimeSince(activity.timestamp)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 line-clamp-2">
+                    {activity.direction === 'inbound' ? (
+                      <>📨 {activity.content}</>
+                    ) : activity.type === 'ai' ? (
+                      <>🤖 {activity.content}</>
+                    ) : (
+                      <>📤 {activity.content}</>
+                    )}
+                  </p>
+                  
+                  {/* Activity badges */}
+                  <div className="flex items-center space-x-1 mt-2">
+                    {activity.isHotLead && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
+                        🔥 Hot
+                      </span>
+                    )}
+                    {activity.hasAlert && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">
+                        🚨 Alert
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No recent activity</p>
+              <p className="text-xs">Activity will appear here as it happens</p>
             </div>
-          </div>
-          
-          <div className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-yellow-800 font-medium">Sarah Johnson - Ready to Present</p>
-              <p className="text-xs text-yellow-600">15 minutes ago</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-200">
-            <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-            <div className="flex-1">
-              <p className="text-sm text-red-800 font-medium">Jessica Williams - No response</p>
-              <p className="text-xs text-red-600">2 hours ago</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

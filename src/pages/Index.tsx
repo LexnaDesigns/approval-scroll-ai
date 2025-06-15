@@ -65,10 +65,17 @@ const Index = () => {
     setShowCloseDealModal(false);
   };
 
+  const handleSidebarClientSelect = (client: Client) => {
+    setSelectedClient(client);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Static Sidebar */}
-      <Sidebar onClose={() => {}} />
+      <Sidebar 
+        onClose={() => {}} 
+        onClientSelect={handleSidebarClientSelect}
+      />
 
       {/* Main Content */}
       <div className="flex-1 ml-64">
