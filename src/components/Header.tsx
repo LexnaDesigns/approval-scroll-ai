@@ -1,5 +1,8 @@
 
-import { Menu } from 'lucide-react';
+import { Search, Bell } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -9,34 +12,72 @@ interface HeaderProps {
 
 export const Header = ({ onMenuClick, hotLeadsCount, managerAlertsCount }: HeaderProps) => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:justify-center">
-      <button
-        onClick={onMenuClick}
-        className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-      >
-        <Menu className="h-6 w-6 text-gray-600" />
-      </button>
-      
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">🚗💥 THE APPROVAL BOARD</h1>
-        <p className="text-sm text-gray-600">Social-Style CRM for Subprime Auto Finance</p>
-        {(hotLeadsCount > 0 || managerAlertsCount > 0) && (
-          <div className="flex justify-center space-x-4 mt-1">
-            {hotLeadsCount > 0 && (
-              <span className="text-xs text-orange-600 font-medium animate-pulse">
-                🔥 {hotLeadsCount} Hot Lead{hotLeadsCount > 1 ? 's' : ''}
-              </span>
-            )}
-            {managerAlertsCount > 0 && (
-              <span className="text-xs text-red-600 font-medium animate-pulse">
-                🚨 {managerAlertsCount} Alert{managerAlertsCount > 1 ? 's' : ''}
-              </span>
-            )}
+    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-40">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
+        {/* Left side - Logo and Title */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">AB</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">The Approval Board</h1>
+              <p className="text-xs text-gray-500">Social-Style CRM for Subprime Auto Finance</p>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Center - Search */}
+        <div className="flex-1 max-w-md mx-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input 
+              placeholder="Search clients..." 
+              className="pl-10 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Right side - Notifications and Stats */}
+        <div className="flex items-center space-x-4">
+          {/* Activity Stats */}
+          {(hotLeadsCount > 0 || managerAlertsCount > 0) && (
+            <div className="flex items-center space-x-3">
+              {hotLeadsCount > 0 && (
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-orange-600">
+                    {hotLeadsCount} Hot Lead{hotLeadsCount > 1 ? 's' : ''}
+                  </span>
+                </div>
+              )}
+              {managerAlertsCount > 0 && (
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-red-600">
+                    {managerAlertsCount} Alert{managerAlertsCount > 1 ? 's' : ''}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Notifications */}
+          <Button variant="ghost" size="sm" className="relative">
+            <Bell className="h-5 w-5" />
+            {(hotLeadsCount + managerAlertsCount) > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
+                {hotLeadsCount + managerAlertsCount}
+              </Badge>
+            )}
+          </Button>
+
+          {/* Profile Avatar */}
+          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+            <span className="text-sm font-medium text-gray-600">U</span>
+          </div>
+        </div>
       </div>
-      
-      <div className="lg:hidden w-10"></div>
     </header>
   );
 };

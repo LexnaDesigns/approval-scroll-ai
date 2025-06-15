@@ -19,7 +19,6 @@ const Index = () => {
   const [showCloseDealModal, setShowCloseDealModal] = useState(false);
   const [showPresentVehicleModal, setShowPresentVehicleModal] = useState(false);
   const [activeClient, setActiveClient] = useState<Client | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const { hotLeads, managerAlerts, clearManagerAlert } = useClientActivity(clients);
   
@@ -68,20 +67,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
-      </div>
+      {/* Static Sidebar */}
+      <Sidebar onClose={() => {}} />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1 ml-64">
         <Header 
-          onMenuClick={() => setSidebarOpen(true)}
+          onMenuClick={() => {}}
           hotLeadsCount={hotLeads.size}
           managerAlertsCount={managerAlerts.size}
         />
 
-        <main className="p-4 max-w-2xl mx-auto">
+        <main className="p-6 max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Client Feed</h2>
+            <p className="text-gray-600">Stay connected with your clients and track their journey</p>
+          </div>
+
           <ClientFeed
             clients={clients}
             isLoading={isLoading}
@@ -114,14 +116,6 @@ const Index = () => {
         onCloseCloseDealModal={() => setShowCloseDealModal(false)}
         onCompleteCloseDeal={handleCompleteCloseDeal}
       />
-
-      {/* Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
     </div>
   );
 };
