@@ -16,7 +16,10 @@ import {
   CheckCircle,
   Target,
   TrendingUp,
-  Clock
+  Clock,
+  Phone,
+  DollarSign,
+  FileText
 } from 'lucide-react';
 
 const Homepage = () => {
@@ -33,53 +36,53 @@ const Homepage = () => {
   const features = [
     {
       icon: Target,
-      title: "Track What Matters",
-      description: "No fluff. Just the numbers that actually move cars off the lot."
+      title: "Track What Actually Moves Cars",
+      description: "Leads, follow-ups, and close rates. Not some fancy algorithm—just the numbers that matter when you're trying to hit your monthly target."
     },
     {
       icon: Users,
-      title: "Know Your Customers",
-      description: "Real profiles. Real credit situations. Real solutions that work."
+      title: "Real Customer Profiles",
+      description: "Credit situations, payment history, and notes that actually help. Because remembering Mrs. Johnson's ex-husband co-signed last time matters."
     },
     {
-      icon: TrendingUp,
-      title: "See the Patterns",
-      description: "Which deals close. Which ones walk. Why some months hit and others don't."
+      icon: Phone,
+      title: "Follow-Up That Works",
+      description: "Automated reminders that don't sound like robots. Your follow-up calls happen when they should, not when you remember."
     },
     {
       icon: Calendar,
-      title: "Stay Organized",
-      description: "Follow-ups that actually happen. Appointments that show up."
+      title: "Appointments That Show",
+      description: "Scheduling that actually sends reminders. Because 'I forgot' stops being an excuse when the system does the remembering."
     },
     {
-      icon: Clock,
-      title: "Built for Speed",
-      description: "Because time kills deals. Every second counts on the lot."
+      icon: FileText,
+      title: "Paperwork Made Simple",
+      description: "Document tracking that doesn't require a PhD. Upload, organize, and find what you need without digging through filing cabinets."
     },
     {
-      icon: Shield,
-      title: "Actually Secure",
-      description: "Your customer data stays yours. No surprises in the fine print."
+      icon: DollarSign,
+      title: "Commission Tracking",
+      description: "Know exactly where your money is coming from. Track your deals, your pipeline, and your actual earnings—not just hopes and dreams."
     }
   ];
 
   const testimonials = [
     {
-      name: "Rick M.",
-      role: "20+ years on the lot",
-      content: "Finally something that gets it. No corporate BS, just tools that work when you need them to work.",
+      name: "Dave M.",
+      role: "Independent Dealer, Alberta",
+      content: "Finally built for guys like me. Not some massive franchise operation with unlimited IT budgets.",
       rating: 5
     },
     {
-      name: "Maria S.",  
-      role: "Finance Manager",
-      content: "Built by someone who's actually been in the trenches. Shows in every feature.",
+      name: "Sarah L.",  
+      role: "Solo Agent, Ontario",
+      content: "Perfect for building my own book of business. Doesn't assume I have a team of 20 people behind me.",
       rating: 5
     },
     {
-      name: "Tony K.",
-      role: "Sales Manager", 
-      content: "My 65-year-old salesmen can actually use this thing. That's saying something.",
+      name: "Mike K.",
+      role: "Small Lot Owner, BC", 
+      content: "My 60-year-old finance guy figured it out in an afternoon. That tells you everything.",
       rating: 5
     }
   ];
@@ -95,7 +98,7 @@ const Homepage = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">Lot CRM</h1>
-              <p className="text-xs text-gray-400">Built by dealers, for dealers</p>
+              <p className="text-xs text-gray-400">Built for Canadian auto sales</p>
             </div>
           </div>
           <Button 
@@ -111,18 +114,18 @@ const Homepage = () => {
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <Badge variant="secondary" className="mb-6 bg-red-900/30 text-red-200 border-red-800">
-            Built by someone who's been there
+            Built by a Canadian dealer, for Canadian dealers
           </Badge>
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Stop Fighting Your
-            <span className="text-red-500"> CRM</span>
+            Finally, a CRM That
+            <span className="text-red-500"> Gets It</span>
           </h1>
           
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            You know the drill. Another "revolutionary" system that doesn't understand 
-            how subprime really works. This one's different. Built by someone who's 
-            actually moved iron on a buy-here-pay-here lot.
+            You know the drill. Another "game-changing" system that doesn't understand 
+            how subprime financing actually works in Canada. This one's different. 
+            Built for small lots, independent dealers, and solo agents building their own business.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -139,30 +142,30 @@ const Homepage = () => {
               variant="outline" 
               className="text-lg px-8 py-4 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
-              Not Another Demo
+              No Sales Pitch
             </Button>
           </div>
 
           {/* Reality Check */}
           <div className="bg-gray-900/50 rounded-2xl p-8 mb-16 border border-gray-700">
-            <h3 className="text-2xl font-bold mb-4 text-red-400">Let's be honest...</h3>
+            <h3 className="text-2xl font-bold mb-4 text-red-400">Let's be honest about your current system...</h3>
             <div className="grid md:grid-cols-3 gap-6 text-left">
               <div>
                 <p className="text-gray-300">
-                  Your current system was built by someone who's never had to explain 
-                  a 28% APR to a customer with a 480 credit score.
+                  It was designed for massive franchise operations with dedicated IT teams. 
+                  You're running a 15-car lot with your cousin doing the books.
                 </p>
               </div>
               <div>
                 <p className="text-gray-300">
-                  Half your team can't figure out how to use it, and the other half 
-                  gave up trying months ago.
+                  Half the features are for markets you'll never see, while the basics 
+                  you need daily are buried in sub-menus or missing entirely.
                 </p>
               </div>
               <div>
                 <p className="text-gray-300">
-                  You're paying for features you'll never use while missing the ones 
-                  you actually need to close deals.
+                  You're paying enterprise prices for enterprise complexity when you just 
+                  need to track leads, follow up, and close deals.
                 </p>
               </div>
             </div>
@@ -170,16 +173,16 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* What Actually Matters */}
+      {/* Not Revolutionary Section */}
       <section className="py-20 bg-gray-900/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              What Actually Matters
+              Not Revolutionary. Just Right.
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              No corporate jargon. No "revolutionary" features. 
-              Just the tools you need to move cars and make money.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              We're not trying to "disrupt" anything. We just built the features that should 
+              have been there all along—the ones you actually use to sell cars and make money.
             </p>
           </div>
 
@@ -200,17 +203,26 @@ const Homepage = () => {
               </Card>
             ))}
           </div>
+
+          <div className="mt-16 text-center">
+            <p className="text-gray-400 text-lg mb-4">
+              These aren't breakthrough innovations. They're basic features that work the way you'd expect them to.
+            </p>
+            <p className="text-gray-300">
+              Because sometimes the most revolutionary thing you can do is just make stuff work properly.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* The Difference */}
+      {/* Built For You */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">The Difference</h2>
+              <h2 className="text-4xl font-bold mb-4">Built For Your Reality</h2>
               <p className="text-xl text-gray-300">
-                Built by someone who understands your world
+                Whether you're running a small lot or building your own sales business
               </p>
             </div>
 
@@ -220,22 +232,29 @@ const Homepage = () => {
                   <div className="flex items-start space-x-4">
                     <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-white font-medium mb-1">Actually understands subprime</p>
-                      <p className="text-gray-400 text-sm">Built for the reality of buy-here-pay-here, not some fantasy dealership</p>
+                      <p className="text-white font-medium mb-1">Perfect for small operations</p>
+                      <p className="text-gray-400 text-sm">5 cars or 50 cars. One salesperson or a small team. Scales with your business, not against it.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
                     <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-white font-medium mb-1">Your older staff can use it</p>
-                      <p className="text-gray-400 text-sm">Real tech support from people who get that not everyone grew up with smartphones</p>
+                      <p className="text-white font-medium mb-1">Solo agent friendly</p>
+                      <p className="text-gray-400 text-sm">Building your own book? We get it. Track your pipeline, manage your leads, grow at your own pace.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
                     <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
                     <div>
-                      <p className="text-white font-medium mb-1">No hidden surprises</p>
-                      <p className="text-gray-400 text-sm">Transparent pricing. No "premium features" locked behind another paywall</p>
+                      <p className="text-white font-medium mb-1">Canadian subprime focus</p>
+                      <p className="text-gray-400 text-sm">Understands how financing actually works here. Credit rebuilding, payment plans, and real-world solutions.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="text-white font-medium mb-1">No enterprise nonsense</p>
+                      <p className="text-gray-400 text-sm">Simple pricing. Real support. No "implementation consultants" or six-month onboarding processes.</p>
                     </div>
                   </div>
                 </div>
@@ -245,22 +264,26 @@ const Homepage = () => {
                   <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <BarChart3 className="h-8 w-8 text-red-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">No BS Dashboard</h3>
+                  <h3 className="text-xl font-bold text-white mb-2">Your Dashboard</h3>
                   <p className="text-gray-300 text-sm mb-4">
-                    See your numbers without having to dig through 12 different reports
+                    The numbers you actually need, when you need them
                   </p>
                   <div className="bg-gray-900 rounded-lg p-4">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-400">Cars on lot:</span>
-                      <span className="text-white font-mono">47</span>
+                      <span className="text-gray-400">Active leads:</span>
+                      <span className="text-white font-mono">23</span>
                     </div>
                     <div className="flex justify-between items-center text-sm mt-2">
                       <span className="text-gray-400">This month:</span>
-                      <span className="text-green-400 font-mono">+$127K</span>
+                      <span className="text-green-400 font-mono">$47K</span>
                     </div>
                     <div className="flex justify-between items-center text-sm mt-2">
-                      <span className="text-gray-400">Hot leads:</span>
-                      <span className="text-red-400 font-mono">8</span>
+                      <span className="text-gray-400">Follow-ups due:</span>
+                      <span className="text-red-400 font-mono">6</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-2">
+                      <span className="text-gray-400">Hot prospects:</span>
+                      <span className="text-yellow-400 font-mono">4</span>
                     </div>
                   </div>
                 </div>
@@ -275,10 +298,10 @@ const Homepage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">
-              From People Who Get It
+              From People Who Actually Use It
             </h2>
             <p className="text-xl text-gray-300">
-              No fake testimonials from stock photo models
+              Real dealers, real feedback, real results
             </p>
           </div>
 
@@ -309,22 +332,22 @@ const Homepage = () => {
       <section className="py-20 bg-gradient-to-r from-red-900/50 to-orange-900/50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to Stop Fighting Your Tools?
+            Ready for a CRM That Actually Works?
           </h2>
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            No sales pitch. No 47-step demo. Just take a look and see if it makes sense 
-            for your operation.
+            No feature bloat. No enterprise complexity. Just the tools you need 
+            to track leads, follow up consistently, and close more deals.
           </p>
           <Button 
             size="lg"
             onClick={() => navigate('/auth')}
             className="bg-red-600 hover:bg-red-700 text-lg px-8 py-4 border-0"
           >
-            Take a Look Inside
+            See What's Inside
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-sm text-gray-400 mt-4">
-            No credit card. No commitment. No sales calls.
+            No credit card. No commitment. No sales calls. Just take a look.
           </p>
         </div>
       </section>
@@ -339,7 +362,7 @@ const Homepage = () => {
               </div>
               <div>
                 <h3 className="font-bold text-white">Lot CRM</h3>
-                <p className="text-sm">Built by dealers, for dealers</p>
+                <p className="text-sm">Built for Canadian auto sales</p>
               </div>
             </div>
             <div className="text-sm">
