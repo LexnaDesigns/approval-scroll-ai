@@ -5,18 +5,24 @@ import { MessageSimulator, MessageUpdate } from '@/services/messageSimulator';
 import { toast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useClientActivity = (clients: Client[]) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [hotLeads, setHotLeads] = useState<Set<string>>(new Set());
   const [managerAlerts, setManagerAlerts] = useState<Set<string>>(new Set());
 
   const handleMessageUpdate = useCallback(async (update: MessageUpdate) => {
+    // Only process if user is authenticated
+    if (!user) return;
+
     // Try to persist communication to Supabase, but don't block on errors
     try {
       const { error } = await supabase.from('communications').insert({
           id: update.communication.id,
           client_id: update.clientId,
+          user_id: user.id, // Add user_id for RLS
           type: update.communication.type,
           content: update.communication.content,
           timestamp: update.communication.timestamp,
@@ -39,7 +45,7 @@ export const useClientActivity = (clients: Client[]) => {
     if (update.isHotLead) {
       setHotLeads(prev => new Set([...prev, update.clientId]));
     }
-  }, [queryClient]);
+  }, [queryClient, user]);
 
   // Use a ref to give the simulator access to the latest clients array
   // without re-triggering the useEffect that creates the simulator.
@@ -47,7 +53,7 @@ export const useClientActivity = (clients: Client[]) => {
   clientsRef.current = clients;
 
   useEffect(() => {
-    if (clients.length === 0) return; // Don't start simulator until clients are loaded
+    if (clients.length === 0 || !user) return; // Don't start simulator until clients are loaded and user is authenticated
     
     const simulator = new MessageSimulator(handleMessageUpdate);
     simulator.start(() => clientsRef.current);
@@ -55,7 +61,7 @@ export const useClientActivity = (clients: Client[]) => {
     return () => {
       simulator.stop();
     };
-  }, [handleMessageUpdate, clients.length]);
+  }, [handleMessageUpdate, clients.length, user]);
 
   const clearManagerAlert = useCallback((clientId: string) => {
     setManagerAlerts(prev => {

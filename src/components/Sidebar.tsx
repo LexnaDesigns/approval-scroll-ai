@@ -1,11 +1,13 @@
 
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, LogOut } from 'lucide-react';
 import { Client } from '@/types/client';
 import { SidebarNav } from './SidebarNav';
 import { SidebarLiveFeed } from './SidebarLiveFeed';
 import { SidebarAnalyticsSummary } from './SidebarAnalyticsSummary';
 import { useClients } from '@/hooks/useClients';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   onClose: () => void;
@@ -14,6 +16,11 @@ interface SidebarProps {
 
 export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
   const { clients } = useClients();
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <div className="fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl border-r border-gray-200 flex flex-col">
@@ -35,6 +42,28 @@ export const Sidebar = ({ onClose, onClientSelect }: SidebarProps) => {
           <X className="h-5 w-5 text-gray-500" />
         </button>
       </div>
+
+      {/* User Info */}
+      {user && (
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                {user.user_metadata?.name || user.email}
+              </p>
+              <p className="text-xs text-gray-500">{user.email}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">

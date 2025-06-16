@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address: string | null
@@ -28,6 +67,7 @@ export type Database = {
           name: string
           phone: string | null
           stage: Database["public"]["Enums"]["client_stage"] | null
+          user_id: string
         }
         Insert: {
           address?: string | null
@@ -47,6 +87,7 @@ export type Database = {
           name: string
           phone?: string | null
           stage?: Database["public"]["Enums"]["client_stage"] | null
+          user_id: string
         }
         Update: {
           address?: string | null
@@ -66,6 +107,7 @@ export type Database = {
           name?: string
           phone?: string | null
           stage?: Database["public"]["Enums"]["client_stage"] | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -77,6 +119,7 @@ export type Database = {
           id: string
           timestamp: string
           type: Database["public"]["Enums"]["communication_type"]
+          user_id: string
         }
         Insert: {
           client_id: string
@@ -85,6 +128,7 @@ export type Database = {
           id: string
           timestamp: string
           type: Database["public"]["Enums"]["communication_type"]
+          user_id: string
         }
         Update: {
           client_id?: string
@@ -93,6 +137,7 @@ export type Database = {
           id?: string
           timestamp?: string
           type?: Database["public"]["Enums"]["communication_type"]
+          user_id?: string
         }
         Relationships: [
           {
@@ -104,6 +149,33 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -112,6 +184,16 @@ export type Database = {
       get_complete_schema: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      log_audit_event: {
+        Args: {
+          p_action: string
+          p_table_name: string
+          p_record_id?: string
+          p_old_values?: Json
+          p_new_values?: Json
+        }
+        Returns: undefined
       }
     }
     Enums: {
