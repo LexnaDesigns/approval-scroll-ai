@@ -39,15 +39,11 @@ const Homepage = () => {
         <meta name="twitter:site" content="@movemetalcrm" />
         <meta name="twitter:image" content="/movemetal-logo.png" />
 
-        {/* Favicon */}
+        {/* Favicon (tab logo) */}
         <link rel="icon" href="/movemetal-logo.png" type="image/png" />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-        <div className="flex justify-center py-6">
-          <img src="/movemetal-logo.png" alt="MoveMetal CRM Logo" className="w-40 h-auto" />
-        </div>
-
         <HomepageHeader />
         <HeroSection />
         <div className="container mx-auto px-4">
