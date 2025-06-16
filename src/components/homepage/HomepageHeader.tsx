@@ -8,9 +8,8 @@ const HomepageHeader = () => {
   return (
     <header className="border-b border-gray-700 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Removed logo and title block */}
-
-        <div></div> {/* Keeps the layout aligned */}
+        {/* Just a simple title, no logo box */}
+        <h1 className="text-xl font-bold text-white">MoveMetal CRM</h1>
 
         <Button 
           onClick={() => navigate('/auth')} 
