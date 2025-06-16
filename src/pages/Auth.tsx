@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -43,7 +43,7 @@ const Auth = () => {
         setError(error.message);
       }
     } else {
-      navigate('/');
+      navigate('/dashboard');
     }
 
     setLoading(false);
@@ -83,11 +83,21 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Back to homepage button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Homepage
+        </Button>
+
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-xl">CRM</span>
+            <span className="text-white font-bold text-xl">CR</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome to CRM Pro</h1>
           <p className="text-gray-600 mt-2">Manage your clients and grow your business</p>
