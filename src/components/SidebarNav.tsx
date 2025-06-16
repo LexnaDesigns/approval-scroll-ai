@@ -1,37 +1,37 @@
 
 import React from 'react';
+import { Home, BarChart3, Calendar, Settings } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart3, Calendar, Users } from 'lucide-react';
 
-const navItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: Users, label: 'Clients', path: '/dashboard' },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-  { icon: Calendar, label: 'Calendar', path: '/calendar' },
+const navigationItems = [
+  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Settings', href: '#', icon: Settings },
 ];
 
 export const SidebarNav = () => {
   return (
-    <div>
-      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Navigation</h3>
-      <nav className="space-y-2">
-        {navItems.map((item) => (
+    <nav className="space-y-1">
+      {navigationItems.map((item) => {
+        const Icon = item.icon;
+        return (
           <NavLink
-            key={item.path}
-            to={item.path}
+            key={item.name}
+            to={item.href}
             className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              `group rounded-lg px-3 py-2 text-sm font-medium flex items-center transition-colors ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`
             }
           >
-            <item.icon className="h-5 w-5" />
-            <span>{item.label}</span>
+            <Icon className="mr-3 h-5 w-5 flex-shrink-0" />
+            {item.name}
           </NavLink>
-        ))}
-      </nav>
-    </div>
+        );
+      })}
+    </nav>
   );
 };
